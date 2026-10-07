@@ -1,0 +1,227 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-brand:       #1a1a2e;
+    --color-brand-mid:   #16213e;
+    --color-accent:      #c9a84c;
+    --color-accent-light:#e8c97a;
+    --color-surface:     #f8f7f4;
+    --color-card:        #ffffff;
+    --color-text:        #1c1c1c;
+    --color-muted:       #6b7280;
+    --color-border:      #e5e2db;
+  }
+
+  html {
+    @apply antialiased scroll-smooth;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  .font-mono-custom {
+    font-family: 'DM Mono', 'Courier New', monospace;
+  }
+
+  * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+}
+
+@layer components {
+
+  /* ── Buttons ── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3
+           bg-[#1a1a2e] hover:bg-[#16213e] text-white font-semibold
+           rounded-none tracking-wide transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-[#c9a84c] focus:ring-offset-2
+           text-sm uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3
+           bg-[#c9a84c] hover:bg-[#b8963e] text-[#1a1a2e] font-bold
+           rounded-none tracking-wide transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-[#1a1a2e] focus:ring-offset-2
+           text-sm uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3
+           border-2 border-[#1a1a2e] text-[#1a1a2e] font-semibold
+           hover:bg-[#1a1a2e] hover:text-white
+           rounded-none tracking-wide transition-all duration-200 text-sm uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-whatsapp {
+    @apply inline-flex items-center justify-center gap-2.5 px-6 py-3
+           bg-[#25d366] hover:bg-[#1ebe5d] text-white font-bold
+           rounded-none tracking-wide transition-all duration-200 text-sm uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2
+           text-[#1a1a2e] hover:bg-[#1a1a2e]/5 font-medium
+           rounded-none transition-colors duration-150 text-sm;
+  }
+
+  /* ── Cards ── */
+  .vehicle-card {
+    @apply bg-white border border-[#e5e2db] overflow-hidden
+           transition-all duration-300 hover:border-[#c9a84c] hover:shadow-xl;
+  }
+
+  .vehicle-card:hover .card-image img {
+    transform: scale(1.04);
+  }
+
+  /* ── Badges ── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold tracking-wide uppercase;
+    letter-spacing: 0.06em;
+  }
+  .badge-gold    { @apply badge bg-[#c9a84c] text-[#1a1a2e]; }
+  .badge-navy    { @apply badge bg-[#1a1a2e] text-white; }
+  .badge-green   { @apply badge bg-emerald-600 text-white; }
+  .badge-red     { @apply badge bg-red-600 text-white; }
+  .badge-amber   { @apply badge bg-amber-500 text-white; }
+  .badge-outline { @apply badge border border-[#c9a84c] text-[#c9a84c] bg-transparent; }
+
+  /* ── Section labels ── */
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-[0.2em] text-[#c9a84c] mb-3 block;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply text-3xl md:text-4xl font-bold text-[#1a1a2e] leading-tight;
+  }
+
+  .section-subtitle {
+    @apply text-[#6b7280] text-base leading-relaxed max-w-xl;
+  }
+
+  /* ── Divider ── */
+  .divider-gold {
+    @apply w-12 h-0.5 bg-[#c9a84c];
+  }
+
+  /* ── Form inputs ── */
+  .input-base {
+    @apply w-full px-4 py-3 border border-[#e5e2db] bg-white text-sm
+           focus:outline-none focus:border-[#c9a84c] focus:ring-1 focus:ring-[#c9a84c]
+           placeholder-[#9ca3af] rounded-none transition-colors;
+  }
+
+  .select-base {
+    @apply input-base appearance-none cursor-pointer;
+  }
+
+  /* ── Filter accordion ── */
+  .filter-group {
+    @apply border-b border-[#e5e2db] pb-4 mb-4 last:border-0 last:pb-0 last:mb-0;
+  }
+
+  /* ── Stat box ── */
+  .stat-box {
+    @apply text-center p-6 border border-[#e5e2db] bg-white;
+  }
+
+  /* ── Spec row ── */
+  .spec-row {
+    @apply flex justify-between items-center py-3 border-b border-[#e5e2db]
+           text-sm last:border-0;
+  }
+
+  .spec-label { @apply text-[#6b7280] font-medium; }
+  .spec-value { @apply text-[#1a1a2e] font-semibold text-right; }
+
+  /* ── Gallery ── */
+  .gallery-thumb {
+    @apply border-2 border-transparent cursor-pointer overflow-hidden
+           transition-all duration-150;
+  }
+  .gallery-thumb.active { border-color: var(--color-accent); }
+
+  /* ── Nav link ── */
+  .nav-link {
+    @apply text-sm font-medium text-[#374151] hover:text-[#1a1a2e]
+           transition-colors relative;
+  }
+  .nav-link::after {
+    content: '';
+    @apply absolute -bottom-0.5 left-0 w-0 h-0.5 bg-[#c9a84c] transition-all duration-200;
+  }
+  .nav-link:hover::after { @apply w-full; }
+
+  /* ── Price ── */
+  .price-main {
+    font-family: 'Playfair Display', Georgia, serif;
+    @apply text-2xl font-bold text-[#1a1a2e];
+  }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb-item {
+    @apply text-xs text-[#9ca3af] hover:text-[#1a1a2e] transition-colors;
+  }
+
+  /* ── Admin sidebar ── */
+  .admin-nav-item {
+    @apply flex items-center gap-3 px-4 py-2.5 text-sm font-medium
+           text-slate-300 hover:text-white hover:bg-white/10
+           transition-colors rounded-lg;
+  }
+  .admin-nav-item.active {
+    @apply bg-[#c9a84c]/20 text-[#c9a84c];
+  }
+
+  /* ── Dashboard card ── */
+  .dash-card {
+    @apply bg-white border border-slate-100 p-6 rounded-xl;
+  }
+
+  /* ── Scroll hide ── */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+}
+
+@layer utilities {
+  .text-brand  { color: var(--color-brand); }
+  .text-accent { color: var(--color-accent); }
+  .bg-brand    { background-color: var(--color-brand); }
+  .bg-accent   { background-color: var(--color-accent); }
+  .border-accent { border-color: var(--color-accent); }
+
+  .clip-hero {
+    clip-path: polygon(0 0, 100% 0, 100% 88%, 0 100%);
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .writing-vertical {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+}

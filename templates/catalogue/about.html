@@ -1,0 +1,563 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About Grandpa Motors — Quality Vehicles in Kenya{% endblock %}
+
+{% block content %}
+
+{# ── Header ── #}
+
+<div class="bg-[#1a1a2e]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+    <nav class="flex items-center gap-2 text-xs mb-6" aria-label="Breadcrumb">
+      <a href="{% url 'catalogue:homepage' %}"
+         class="text-[#64748b] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors">
+        Home
+      </a>
+
+```
+  <svg class="w-3 h-3 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+  </svg>
+
+  <span class="text-[#c9a84c] font-semibold uppercase tracking-wide">
+    About
+  </span>
+</nav>
+
+<span class="section-label text-[#c9a84c]">
+  Our Story
+</span>
+
+<h1 style="font-family:'Playfair Display',serif; font-weight:800; font-size:clamp(2rem,5vw,3.5rem); color:#ffffff; line-height:1.1; max-width:36rem;">
+  Built on Trust.<br/>
+  Driven by Quality.
+</h1>
+```
+
+  </div>
+</div>
+
+{# ── Mission ── #}
+
+<section class="py-16 lg:py-20 bg-[#f8f7f4]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+```
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+
+  <div>
+    <span class="section-label">
+      Who We Are
+    </span>
+
+    <h2 class="section-title mb-4">
+      Nairobi's Dealership<br/>
+      You Can Rely On
+    </h2>
+
+    <div class="divider-gold mb-7"></div>
+
+    <div class="space-y-4"
+         style="font-size:0.95rem; color:#374151; line-height:1.85;">
+
+      <p>
+        Grandpa Motors was founded with a single purpose:
+        to make buying a vehicle in Kenya a straightforward,
+        honest, and dependable experience.
+      </p>
+
+      <p>
+        The Kenyan used-vehicle market has long been complicated
+        by incomplete documentation, undisclosed mileage, and
+        opaque pricing. We set out to change that.
+        Every vehicle we list has been reviewed by our team,
+        and we publish the full documentation status —
+        logbook, duty, import documents, and transfer readiness —
+        before a customer makes first contact.
+      </p>
+
+      <p>
+        We believe that transparency is not a selling point.
+        It is a baseline. Our role is to connect buyers with
+        vehicles they can trust, and to stand behind that connection.
+      </p>
+
+    </div>
+  </div>
+
+
+  <div class="space-y-0">
+
+    <div class="bg-[#1a1a2e] p-8 lg:p-10">
+
+      <div style="font-family:'Playfair Display',serif;
+                  font-size:3.5rem;
+                  font-weight:700;
+                  color:#c9a84c;
+                  line-height:1;
+                  margin-bottom:0.5rem;">
+        100%
+      </div>
+
+      <div style="font-weight:700;
+                  color:#ffffff;
+                  font-size:0.875rem;
+                  text-transform:uppercase;
+                  letter-spacing:0.1em;
+                  margin-bottom:0.5rem;">
+        Documentation Disclosed
+      </div>
+
+      <div style="font-size:0.8rem;
+                  color:#94a3b8;
+                  line-height:1.6;">
+        Every listing shows full documentation status —
+        no surprises at collection.
+      </div>
+
+    </div>
+
+
+    <div class="grid grid-cols-2 gap-px bg-[#e5e2db]">
+
+      <div class="bg-white p-6">
+        <div style="font-family:'Playfair Display',serif;
+                    font-size:2rem;
+                    font-weight:700;
+                    color:#1a1a2e;">
+          {{ stats.total|default:"500+" }}
+        </div>
+
+        <div style="font-size:0.7rem;
+                    font-weight:700;
+                    text-transform:uppercase;
+                    letter-spacing:0.12em;
+                    color:#6b7280;
+                    margin-top:0.25rem;">
+          Vehicles Sold
+        </div>
+      </div>
+
+
+      <div class="bg-white p-6">
+        <div style="font-family:'Playfair Display',serif;
+                    font-size:2rem;
+                    font-weight:700;
+                    color:#1a1a2e;">
+          {{ stats.available|default:"50+" }}
+        </div>
+
+        <div style="font-size:0.7rem;
+                    font-weight:700;
+                    text-transform:uppercase;
+                    letter-spacing:0.12em;
+                    color:#6b7280;
+                    margin-top:0.25rem;">
+          Currently Available
+        </div>
+      </div>
+
+
+      <div class="bg-white p-6">
+        <div style="font-family:'Playfair Display',serif;
+                    font-size:2rem;
+                    font-weight:700;
+                    color:#1a1a2e;">
+          Same
+        </div>
+
+        <div style="font-size:0.7rem;
+                    font-weight:700;
+                    text-transform:uppercase;
+                    letter-spacing:0.12em;
+                    color:#6b7280;
+                    margin-top:0.25rem;">
+          Day WhatsApp Response
+        </div>
+      </div>
+
+
+      <div class="bg-white p-6">
+        <div style="font-family:'Playfair Display',serif;
+                    font-size:2rem;
+                    font-weight:700;
+                    color:#1a1a2e;">
+          Nairobi
+        </div>
+
+        <div style="font-size:0.7rem;
+                    font-weight:700;
+                    text-transform:uppercase;
+                    letter-spacing:0.12em;
+                    color:#6b7280;
+                    margin-top:0.25rem;">
+          Based, Kenya
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </div>
+</section>
+
+{# ── Values ── #}
+
+<section class="py-16 lg:py-20 bg-white">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+```
+<div class="text-center mb-12">
+
+  <span class="section-label">
+    Our Values
+  </span>
+
+  <h2 class="section-title">
+    The Principles Behind<br/>
+    Every Transaction
+  </h2>
+
+  <div class="divider-gold mx-auto mt-4"></div>
+
+</div>
+
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#e5e2db]">
+
+  {# Value 1 #}
+  <div class="bg-white p-8 lg:p-10">
+
+    <div class="w-10 h-px bg-[#c9a84c] mb-6"></div>
+
+    <h3 style="font-family:'Playfair Display',serif;
+               font-weight:700;
+               font-size:1.2rem;
+               color:#1a1a2e;
+               margin-bottom:0.75rem;">
+      Honesty Before Sales
+    </h3>
+
+    <p style="font-size:0.875rem;
+              color:#6b7280;
+              line-height:1.8;">
+      We disclose what we know about every vehicle —
+      including limitations. A customer who buys with
+      full information is a customer who returns.
+    </p>
+
+  </div>
+
+
+  {# Value 2 #}
+  <div class="bg-white p-8 lg:p-10">
+
+    <div class="w-10 h-px bg-[#c9a84c] mb-6"></div>
+
+    <h3 style="font-family:'Playfair Display',serif;
+               font-weight:700;
+               font-size:1.2rem;
+               color:#1a1a2e;
+               margin-bottom:0.75rem;">
+      Quality Over Volume
+    </h3>
+
+    <p style="font-size:0.875rem;
+              color:#6b7280;
+              line-height:1.8;">
+      We do not list every vehicle that comes through
+      our gates. Each one is reviewed against our
+      documentation and condition standards before
+      it appears on this site.
+    </p>
+
+  </div>
+
+
+  {# Value 3 #}
+  <div class="bg-white p-8 lg:p-10">
+
+    <div class="w-10 h-px bg-[#c9a84c] mb-6"></div>
+
+    <h3 style="font-family:'Playfair Display',serif;
+               font-weight:700;
+               font-size:1.2rem;
+               color:#1a1a2e;
+               margin-bottom:0.75rem;">
+      Direct Relationships
+    </h3>
+
+    <p style="font-size:0.875rem;
+              color:#6b7280;
+              line-height:1.8;">
+      You speak directly with our team on WhatsApp.
+      There are no call center queues, no automated
+      systems between you and an answer.
+    </p>
+
+  </div>
+
+</div>
+```
+
+  </div>
+</section>
+
+{# ── How it works ── #}
+
+<section class="py-16 lg:py-20 bg-[#f8f7f4]">
+
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+
+```
+<div class="text-center mb-12">
+
+  <span class="section-label">
+    The Process
+  </span>
+
+  <h2 class="section-title">
+    From Browse to Keys<br/>
+    in Hand
+  </h2>
+
+  <div class="divider-gold mx-auto mt-4"></div>
+
+</div>
+
+
+<div class="space-y-0">
+
+  {# Step 1 #}
+  <div class="flex gap-6 bg-white border border-[#e5e2db] p-6 lg:p-8 border-b-0">
+
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 bg-[#1a1a2e] flex items-center justify-center">
+        <span style="font-family:'DM Mono',monospace;
+                     font-size:0.75rem;
+                     font-weight:500;
+                     color:#c9a84c;">
+          01
+        </span>
+      </div>
+    </div>
+
+    <div class="pt-1.5">
+
+      <h3 style="font-weight:700;
+                 font-size:0.95rem;
+                 color:#1a1a2e;
+                 margin-bottom:0.4rem;">
+        Browse the Inventory
+      </h3>
+
+      <p style="font-size:0.8rem;
+                color:#6b7280;
+                line-height:1.7;">
+        Search and filter our full vehicle catalogue by
+        make, model, year, price, and documentation status.
+        All listings are live from our database.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  {# Step 2 #}
+  <div class="flex gap-6 bg-white border border-[#e5e2db] p-6 lg:p-8 border-b-0">
+
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 bg-[#1a1a2e] flex items-center justify-center">
+        <span style="font-family:'DM Mono',monospace;
+                     font-size:0.75rem;
+                     font-weight:500;
+                     color:#c9a84c;">
+          02
+        </span>
+      </div>
+    </div>
+
+    <div class="pt-1.5">
+
+      <h3 style="font-weight:700;
+                 font-size:0.95rem;
+                 color:#1a1a2e;
+                 margin-bottom:0.4rem;">
+        Review Documentation Status
+      </h3>
+
+      <p style="font-size:0.8rem;
+                color:#6b7280;
+                line-height:1.7;">
+        Each listing displays the logbook status, duty status,
+        import documents, transfer readiness, and verification
+        badges upfront — before you contact us.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  {# Step 3 #}
+  <div class="flex gap-6 bg-white border border-[#e5e2db] p-6 lg:p-8 border-b-0">
+
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 bg-[#1a1a2e] flex items-center justify-center">
+        <span style="font-family:'DM Mono',monospace;
+                     font-size:0.75rem;
+                     font-weight:500;
+                     color:#c9a84c;">
+          03
+        </span>
+      </div>
+    </div>
+
+    <div class="pt-1.5">
+
+      <h3 style="font-weight:700;
+                 font-size:0.95rem;
+                 color:#1a1a2e;
+                 margin-bottom:0.4rem;">
+        Contact Us on WhatsApp
+      </h3>
+
+      <p style="font-size:0.8rem;
+                color:#6b7280;
+                line-height:1.7;">
+        Send us a WhatsApp message with the vehicle's
+        reference number. We respond the same day with
+        additional details or to arrange a viewing.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  {# Step 4 #}
+  <div class="flex gap-6 bg-white border border-[#e5e2db] p-6 lg:p-8 border-b-0">
+
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 bg-[#1a1a2e] flex items-center justify-center">
+        <span style="font-family:'DM Mono',monospace;
+                     font-size:0.75rem;
+                     font-weight:500;
+                     color:#c9a84c;">
+          04
+        </span>
+      </div>
+    </div>
+
+    <div class="pt-1.5">
+
+      <h3 style="font-weight:700;
+                 font-size:0.95rem;
+                 color:#1a1a2e;
+                 margin-bottom:0.4rem;">
+        Arrange a Viewing
+      </h3>
+
+      <p style="font-size:0.8rem;
+                color:#6b7280;
+                line-height:1.7;">
+        Visit our Nairobi location for a physical inspection.
+        Test drives are arranged on confirmed appointments.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  {# Step 5 #}
+  <div class="flex gap-6 bg-white border border-[#e5e2db] p-6 lg:p-8">
+
+    <div class="flex-shrink-0">
+      <div class="w-10 h-10 bg-[#1a1a2e] flex items-center justify-center">
+        <span style="font-family:'DM Mono',monospace;
+                     font-size:0.75rem;
+                     font-weight:500;
+                     color:#c9a84c;">
+          05
+        </span>
+      </div>
+    </div>
+
+    <div class="pt-1.5">
+
+      <h3 style="font-weight:700;
+                 font-size:0.95rem;
+                 color:#1a1a2e;
+                 margin-bottom:0.4rem;">
+        Complete the Purchase
+      </h3>
+
+      <p style="font-size:0.8rem;
+                color:#6b7280;
+                line-height:1.7;">
+        Complete the ownership transfer with all
+        documentation provided by our team. We assist
+        through every step of the NTSA transfer process.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+```
+
+  </div>
+</section>
+
+{# ── CTA ── #}
+
+<section class="py-14 bg-[#1a1a2e]">
+
+  <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+```
+<h2 style="font-family:'Playfair Display',serif;
+           font-size:clamp(1.5rem,4vw,2.25rem);
+           font-weight:700;
+           color:#ffffff;
+           margin-bottom:1rem;">
+  Ready to Start Your Search?
+</h2>
+
+<p style="color:#94a3b8;
+          font-size:0.9rem;
+          margin-bottom:2rem;
+          line-height:1.7;">
+  Browse our full inventory or contact our team directly.
+  We are here to help you find the right vehicle at a fair price.
+</p>
+
+<div class="flex flex-col sm:flex-row gap-3 justify-center">
+
+  <a href="{% url 'catalogue:vehicle_list' %}"
+     class="btn-accent">
+    Browse Inventory
+  </a>
+
+  <a href="{% url 'catalogue:contact' %}"
+     class="btn-outline"
+     style="color:white; border-color:white;">
+    Contact Us
+  </a>
+
+</div>
+```
+
+  </div>
+
+</section>
+
+{% endblock %}

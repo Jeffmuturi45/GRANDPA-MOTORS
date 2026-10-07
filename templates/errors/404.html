@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="min-h-[60vh] flex items-center justify-center text-center px-4">
+  <div>
+    <div class="text-8xl mb-4">🚗</div>
+    <h1 class="font-display text-4xl font-bold text-slate-800 mb-2">404 — Not Found</h1>
+    <p class="text-slate-500 mb-6">This vehicle or page doesn't exist or has been removed.</p>
+    <a href="{% url 'catalogue:homepage' %}" class="btn-primary">Back to Homepage</a>
+  </div>
+</div>
+{% endblock %}

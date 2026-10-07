@@ -1,0 +1,149 @@
+{% load humanize %}
+<article class="vehicle-card bg-white group flex flex-col">
+  <a href="{{ vehicle.get_absolute_url }}" class="flex flex-col flex-1">
+
+    {# ── Image ── #}
+    <div class="card-image relative overflow-hidden bg-[#f1ede6]" style="aspect-ratio:16/10;">
+      {% with img=vehicle.primary_images_list.0|default:None %}
+      {% if img %}
+      <img
+        src="{{ img.image.url }}"
+        alt="{{ img.alt_text|default:vehicle.title }}"
+        class="w-full h-full object-cover transition-transform duration-500"
+        {% if forloop.first and forloop.parentloop.first %}
+          loading="eager" fetchpriority="high"
+        {% else %}
+          loading="lazy"
+        {% endif %}
+        width="400" height="250"
+      />
+      {% else %}
+      <div class="w-full h-full flex flex-col items-center justify-center bg-[#f1ede6]">
+        <svg class="w-12 h-12 text-[#d1ccc4]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+        </svg>
+        <span style="font-size:0.65rem; letter-spacing:0.12em; color:#c8c0b8; font-weight:600; text-transform:uppercase; margin-top:0.5rem;">No Image</span>
+      </div>
+      {% endif %}
+      {% endwith %}
+
+      {# Top badges #}
+      <div class="absolute top-0 left-0 flex flex-col gap-0">
+        {% if vehicle.featured %}
+        <span class="badge-gold py-1 px-2.5 text-[10px] tracking-widest">Featured</span>
+        {% endif %}
+        {% if vehicle.new_arrival %}
+        <span class="badge-navy py-1 px-2.5 text-[10px] tracking-widest">New Arrival</span>
+        {% endif %}
+        {% if vehicle.is_price_reduced %}
+        <span class="badge-red py-1 px-2.5 text-[10px] tracking-widest">Price Reduced</span>
+        {% endif %}
+      </div>
+
+      {# Status overlay #}
+      {% if vehicle.status == "SOLD" %}
+      <div class="absolute inset-0 bg-[#1a1a2e]/70 flex items-center justify-center">
+        <span style="font-family:'Playfair Display',serif; font-size:1.25rem; font-weight:700; color:#c9a84c; letter-spacing:0.15em; border:2px solid #c9a84c; padding:0.5rem 1.5rem;">SOLD</span>
+      </div>
+      {% elif vehicle.status == "RESERVED" %}
+      <div class="absolute top-0 right-0">
+        <span class="badge-amber py-1 px-2.5 text-[10px] tracking-widest">Reserved</span>
+      </div>
+      {% endif %}
+    </div>
+
+    {# ── Card body ── #}
+    <div class="p-5 flex flex-col flex-1">
+
+      {# Condition + Year #}
+      <div class="flex items-center gap-2 mb-2">
+        <span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
+          {% if vehicle.condition == 'NEW' %}color:#059669;
+          {% elif vehicle.condition == 'FOREIGN_USED' %}color:#2563eb;
+          {% elif vehicle.condition == 'LOCALLY_USED' %}color:#d97706;
+          {% else %}color:#7c3aed;{% endif %}">
+          {{ vehicle.get_condition_display }}
+        </span>
+        <span style="color:#d1ccc4;">·</span>
+        <span style="font-size:0.7rem; font-weight:600; color:#9ca3af; font-family:'DM Mono',monospace;">{{ vehicle.year }}</span>
+        {% if vehicle.location %}
+        <span style="color:#d1ccc4;">·</span>
+        <span style="font-size:0.65rem; color:#9ca3af; letter-spacing:0.05em;">{{ vehicle.location }}</span>
+        {% endif %}
+      </div>
+
+      {# Title #}
+      <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1rem; color:#1a1a2e; line-height:1.3; margin-bottom:0.75rem;"
+          class="group-hover:text-[#c9a84c] transition-colors line-clamp-2">
+        {{ vehicle.make.name }} {{ vehicle.model.name }}{% if vehicle.variant %} <span style="font-weight:400; color:#6b7280;">{{ vehicle.variant }}</span>{% endif %}
+      </h3>
+
+      {# Specs #}
+      <div class="flex flex-wrap gap-x-3 gap-y-1 mb-4">
+        {% if vehicle.mileage %}
+        <span style="font-size:0.72rem; color:#6b7280; font-weight:500;">
+          <span class="font-mono-custom">{{ vehicle.mileage|intcomma }}</span> km
+        </span>
+        {% endif %}
+        {% if vehicle.fuel_type %}
+        <span style="font-size:0.72rem; color:#6b7280;">{{ vehicle.get_fuel_type_display }}</span>
+        {% endif %}
+        {% if vehicle.transmission %}
+        <span style="font-size:0.72rem; color:#6b7280;">{{ vehicle.get_transmission_display }}</span>
+        {% endif %}
+        {% if vehicle.engine_capacity %}
+        <span style="font-size:0.72rem; color:#6b7280;">{{ vehicle.engine_capacity }}L</span>
+        {% endif %}
+      </div>
+
+      {# Price — pushed to bottom #}
+      <div class="mt-auto">
+        <div class="mb-3">
+          {% if vehicle.pricing_type == "PRICE_ON_REQUEST" or not vehicle.price %}
+          <span style="font-family:'Playfair Display',serif; font-size:1.05rem; font-weight:700; color:#1a1a2e;">Price on Request</span>
+          {% else %}
+          <div class="flex items-baseline gap-2 flex-wrap">
+            <span style="font-family:'Playfair Display',serif; font-size:1.2rem; font-weight:700; color:#1a1a2e;">
+              KSh {{ vehicle.price|floatformat:0|intcomma }}
+            </span>
+            {% if vehicle.is_price_reduced %}
+            <span style="font-size:0.75rem; color:#9ca3af; text-decoration:line-through; font-family:'DM Mono',monospace;">
+              {{ vehicle.previous_price|floatformat:0|intcomma }}
+            </span>
+            {% endif %}
+          </div>
+          {% if vehicle.pricing_type == "NEGOTIABLE" %}
+          <span style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#059669;">Negotiable</span>
+          {% endif %}
+          {% endif %}
+        </div>
+
+        {# Documentation badges #}
+        {% with doc=vehicle.documentation ver=vehicle.verification %}
+        {% if doc or ver %}
+        <div class="flex flex-wrap gap-1 mb-4">
+          {% if doc %}{% for badge in doc.public_badges %}
+          <span style="font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 6px; background:#ecfdf5; color:#065f46; border:1px solid #a7f3d0;">{{ badge.label }}</span>
+          {% endfor %}{% endif %}
+          {% if ver %}{% for badge in ver.public_badges %}
+          <span style="font-size:0.6rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; padding:2px 6px; background:#eff6ff; color:#1e40af; border:1px solid #bfdbfe;">{{ badge.label }}</span>
+          {% endfor %}{% endif %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        {# CTA row #}
+        <div class="flex items-center justify-between pt-3 border-t border-[#e5e2db]">
+          <span style="font-family:'DM Mono',monospace; font-size:0.65rem; color:#c8c0b8; letter-spacing:0.08em;">{{ vehicle.stock_number }}</span>
+          <span style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#1a1a2e;" class="group-hover:text-[#c9a84c] transition-colors flex items-center gap-1">
+            View Details
+            <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+    </div>
+  </a>
+</article>

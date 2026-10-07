@@ -1,0 +1,136 @@
+{% load humanize %}
+<div class="bg-white rounded-xl border border-slate-100 p-4 sticky top-20">
+  <form method="get" action="{% url 'catalogue:vehicle_list' %}" id="filter-form">
+    {% if params.q %}
+    <input type="hidden" name="q" value="{{ params.q }}" />
+    {% endif %}
+    <input type="hidden" name="sort" value="{{ sort_key }}" />
+
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-display font-semibold text-slate-800">Filters</h2>
+      {% if active_filters %}
+      <a href="{% url 'catalogue:vehicle_list' %}" class="text-xs text-red-500 hover:underline">Clear all</a>
+      {% endif %}
+    </div>
+
+    {# Condition #}
+    <div class="filter-section" x-data="{ open: true }">
+      <button type="button" @click="open = !open"
+              class="flex items-center justify-between w-full text-sm font-semibold text-slate-700 mb-2">
+        Condition
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div x-show="open" class="space-y-1.5">
+        {% for value, label in vehicle_conditions|default:"" %}{% empty %}
+        {% for item in "NF LR" %}{% endfor %}
+        {% for value, label in condition_choices %}
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
+          <input type="checkbox" name="condition" value="{{ value }}"
+                 {% if value in params.getlist|default:"condition" %}checked{% endif %}
+                 class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                 onchange="document.getElementById('filter-form').submit()" />
+          {{ label }}
+        </label>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Price Range #}
+    <div class="filter-section" x-data="{ open: true }">
+      <button type="button" @click="open = !open"
+              class="flex items-center justify-between w-full text-sm font-semibold text-slate-700 mb-2">
+        Price (KSh)
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div x-show="open" class="grid grid-cols-2 gap-2">
+        <input type="number" name="price_min" value="{{ params.price_min }}"
+               placeholder="Min" min="0"
+               class="form-input-base text-sm py-1.5" />
+        <input type="number" name="price_max" value="{{ params.price_max }}"
+               placeholder="Max" min="0"
+               class="form-input-base text-sm py-1.5" />
+      </div>
+    </div>
+
+    {# Makes #}
+    {% if all_makes %}
+    <div class="filter-section" x-data="{ open: true }">
+      <button type="button" @click="open = !open"
+              class="flex items-center justify-between w-full text-sm font-semibold text-slate-700 mb-2">
+        Make
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div x-show="open" class="space-y-1.5 max-h-48 overflow-y-auto">
+        {% for make in all_makes %}
+        <label class="flex items-center justify-between gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
+          <span class="flex items-center gap-2">
+            <input type="checkbox" name="make" value="{{ make.slug }}"
+                   class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                   onchange="document.getElementById('filter-form').submit()" />
+            {{ make.name }}
+          </span>
+          <span class="text-xs text-slate-400">{{ make.vehicle_count }}</span>
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {# Year #}
+    <div class="filter-section" x-data="{ open: false }">
+      <button type="button" @click="open = !open"
+              class="flex items-center justify-between w-full text-sm font-semibold text-slate-700 mb-2">
+        Year
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div x-show="open" class="grid grid-cols-2 gap-2">
+        <input type="number" name="year_min" value="{{ params.year_min }}"
+               placeholder="From" min="1990" max="2030"
+               class="form-input-base text-sm py-1.5" />
+        <input type="number" name="year_max" value="{{ params.year_max }}"
+               placeholder="To" min="1990" max="2030"
+               class="form-input-base text-sm py-1.5" />
+      </div>
+    </div>
+
+    {# Documentation #}
+    <div class="filter-section" x-data="{ open: false }">
+      <button type="button" @click="open = !open"
+              class="flex items-center justify-between w-full text-sm font-semibold text-slate-700 mb-2">
+        Documentation
+        <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+        </svg>
+      </button>
+      <div x-show="open" class="space-y-1.5">
+        {% for value, label in doc_filters %}{% empty %}
+        {% for item in "1234" %}
+        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900">
+          <input type="checkbox"
+                 name="{% if forloop.counter == 1 %}docs_ready{% elif forloop.counter == 2 %}duty_paid{% elif forloop.counter == 3 %}transfer_ready{% else %}inspected{% endif %}"
+                 value="1"
+                 class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                 onchange="document.getElementById('filter-form').submit()" />
+          {% if forloop.counter == 1 %}Documents Ready
+          {% elif forloop.counter == 2 %}Duty Paid
+          {% elif forloop.counter == 3 %}Transfer Ready
+          {% else %}Inspected{% endif %}
+        </label>
+        {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+
+    {# Apply button #}
+    <button type="submit" class="btn-primary w-full mt-2 justify-center">Apply Filters</button>
+  </form>
+</div>

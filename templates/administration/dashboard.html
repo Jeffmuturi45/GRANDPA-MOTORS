@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Dashboard — Grandpa Motors Admin{% endblock %}</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    :root {
+      --dash-sidebar:  #0f172a;
+      --dash-sidebar2: #1e293b;
+      --dash-accent:   #c9a84c;
+      --dash-bg:       #f1f5f9;
+      --dash-card:     #ffffff;
+    }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--dash-bg); }
+  </style>
+</head>
+
+<body class="h-full"
+      x-data="{
+        sidebarOpen: true,
+        mobileSidebarOpen: false,
+        currentSection: '{{ active_section|default:"dashboard" }}'
+      }">
+
+<div class="flex h-screen overflow-hidden">
+
+  {# ═══════════════════════════════════
+     SIDEBAR
+  ═══════════════════════════════════ #}
+  <aside
+    :class="sidebarOpen ? 'w-64' : 'w-16'"
+    class="hidden lg:flex flex-col transition-all duration-300 flex-shrink-0 overflow-hidden"
+    style="background: var(--dash-sidebar);"
+  >
+    {# Logo #}
+    <div class="flex items-center gap-3 px-4 py-5 border-b border-white/10 flex-shrink-0">
+      <div class="w-8 h-8 flex-shrink-0 flex items-center justify-center"
+           style="background:#c9a84c;">
+        <span style="font-family:'Playfair Display',serif; font-weight:700; color:#0f172a; font-size:1rem;">G</span>
+      </div>
+      <div x-show="sidebarOpen" x-transition:enter="transition delay-75" class="overflow-hidden">
+        <div style="font-family:'Playfair Display',serif; font-weight:700; font-size:0.9rem; color:#ffffff; white-space:nowrap;">Grandpa Motors</div>
+        <div style="font-size:0.6rem; letter-spacing:0.15em; color:#c9a84c; font-weight:600; text-transform:uppercase; white-space:nowrap;">Admin Panel</div>
+      </div>
+    </div>
+
+    {# Nav #}
+    <nav class="flex-1 overflow-y-auto py-4 space-y-0.5 px-2">
+
+      <div x-show="sidebarOpen" class="px-2 pb-2">
+        <span style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:#475569;">Main</span>
+      </div>
+
+      {% for item in nav_items %}
+      <a href="{{ item.url }}"
+         :class="currentSection === '{{ item.key }}' ? 'bg-[#c9a84c]/20 text-[#c9a84c]' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium">
+        <span class="flex-shrink-0 w-5 h-5">{{ item.icon_svg|safe }}</span>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">{{ item.label }}</span>
+      </a>
+      {% empty %}
+
+      {# Default nav items #}
+      {% with items="dashboard,vehicles,add_vehicle,makes,categories,features,analytics,settings" %}
+      <a href="{% url 'administration:dashboard' %}"
+         :class="currentSection==='dashboard' ? 'bg-[#c9a84c]/20 text-[#c9a84c]' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Dashboard</span>
+      </a>
+
+      <a href="/admin/vehicles/vehicle/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Inventory</span>
+      </a>
+
+      <a href="/admin/vehicles/vehicle/add/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Add Vehicle</span>
+      </a>
+
+      <div x-show="sidebarOpen" class="px-2 pt-4 pb-2">
+        <span style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:#475569;">Catalogue</span>
+      </div>
+
+      <a href="/admin/vehicles/make/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Makes</span>
+      </a>
+
+      <a href="/admin/vehicles/category/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Categories</span>
+      </a>
+
+      <a href="/admin/vehicles/feature/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Features</span>
+      </a>
+
+      <div x-show="sidebarOpen" class="px-2 pt-4 pb-2">
+        <span style="font-size:0.6rem; font-weight:700; text-transform:uppercase; letter-spacing:0.15em; color:#475569;">Analytics</span>
+      </div>
+
+      <a href="{% url 'administration:analytics' %}"
+         :class="currentSection==='analytics' ? 'bg-[#c9a84c]/20 text-[#c9a84c]' : 'text-slate-400 hover:text-white hover:bg-white/5'"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Analytics</span>
+      </a>
+
+      <a href="/admin/vehicles/auditlog/" target="_blank"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors text-sm font-medium text-slate-400 hover:text-white hover:bg-white/5">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        <span x-show="sidebarOpen" class="whitespace-nowrap">Audit Log</span>
+      </a>
+
+      {% endwith %}
+      {% endfor %}
+    </nav>
+
+    {# Sidebar footer #}
+    <div class="flex-shrink-0 border-t border-white/10 p-3">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-[#c9a84c]/20 flex items-center justify-center flex-shrink-0">
+          <span style="font-size:0.75rem; font-weight:700; color:#c9a84c;">
+            {{ request.user.get_initials|default:request.user.username|slice:":2"|upper }}
+          </span>
+        </div>
+        <div x-show="sidebarOpen" class="flex-1 min-w-0">
+          <div style="font-size:0.8rem; font-weight:600; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            {{ request.user.get_full_name|default:request.user.username }}
+          </div>
+          <div style="font-size:0.65rem; color:#64748b;">Superadmin</div>
+        </div>
+        <a href="/admin/logout/" x-show="sidebarOpen"
+           title="Logout"
+           class="text-slate-500 hover:text-white p-1 transition-colors flex-shrink-0">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  {# ═══════════════════════════════════
+     MAIN AREA
+  ═══════════════════════════════════ #}
+  <div class="flex-1 flex flex-col overflow-hidden">
+
+    {# ── Top bar ── #}
+    <header class="bg-white border-b border-slate-100 px-6 py-3.5 flex items-center justify-between flex-shrink-0">
+      <div class="flex items-center gap-4">
+        <button @click="sidebarOpen = !sidebarOpen"
+                class="hidden lg:block p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                aria-label="Toggle sidebar">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <div>
+          <h1 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.15rem; color:#0f172a; line-height:1.2;">
+            {% block page_heading %}Dashboard{% endblock %}
+          </h1>
+          <div style="font-size:0.7rem; color:#94a3b8; letter-spacing:0.05em;">{% block page_subheading %}Grandpa Motors Admin{% endblock %}</div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        {# Quick action: add vehicle #}
+        <a href="/admin/vehicles/vehicle/add/" target="_blank"
+           class="hidden sm:flex items-center gap-2 text-xs font-bold uppercase tracking-widest px-4 py-2 bg-[#1a1a2e] hover:bg-[#0f172a] text-white transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+          </svg>
+          Add Vehicle
+        </a>
+
+        {# View public site #}
+        <a href="{% url 'catalogue:homepage' %}" target="_blank"
+           class="hidden sm:flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-[#1a1a2e] border border-slate-200 px-3 py-2 transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+          Live Site
+        </a>
+      </div>
+    </header>
+
+    {# ── Page content ── #}
+    <main class="flex-1 overflow-y-auto p-6">
+      {% block dashboard_content %}
+
+      {# ── KPI Cards ── #}
+      <div class="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 mb-6">
+        {% for kpi in kpis %}
+        <div class="bg-white border border-slate-100 rounded-xl p-5 relative overflow-hidden group hover:border-[#c9a84c] transition-colors">
+          <div class="absolute top-0 right-0 w-16 h-16 opacity-5 group-hover:opacity-10 transition-opacity">
+            <svg viewBox="0 0 100 100" class="w-full h-full fill-[#1a1a2e]">{{ kpi.bg_shape|safe }}</svg>
+          </div>
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:{{ kpi.color|default:'#6b7280' }}; margin-bottom:0.5rem;">{{ kpi.label }}</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a; line-height:1;">{{ kpi.value }}</div>
+          {% if kpi.sub %}
+          <div style="font-size:0.7rem; color:#94a3b8; margin-top:0.25rem;">{{ kpi.sub }}</div>
+          {% endif %}
+        </div>
+        {% empty %}
+        {# Static KPIs using context vars #}
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-[#c9a84c] transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#6b7280; margin-bottom:0.5rem;">Total Vehicles</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.total|default:0 }}</div>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-emerald-400 transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#059669; margin-bottom:0.5rem;">Available</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.available|default:0 }}</div>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-amber-400 transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#d97706; margin-bottom:0.5rem;">Reserved</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.reserved|default:0 }}</div>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-red-400 transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#dc2626; margin-bottom:0.5rem;">Sold</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.sold|default:0 }}</div>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-[#c9a84c] transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#c9a84c; margin-bottom:0.5rem;">Featured</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.featured|default:0 }}</div>
+        </div>
+        <div class="bg-white border border-slate-100 rounded-xl p-5 hover:border-blue-400 transition-colors">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#2563eb; margin-bottom:0.5rem;">New Arrivals</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#0f172a;">{{ stats.new_arrivals|default:0 }}</div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# ── Traffic KPIs ── #}
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {% for period, value in traffic_stats.items %}
+        <div class="bg-[#1a1a2e] rounded-xl p-5">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#c9a84c; margin-bottom:0.5rem;">{{ period }}</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#ffffff;">{{ value }}</div>
+          <div style="font-size:0.7rem; color:#475569;">Page Views</div>
+        </div>
+        {% empty %}
+        {% for label, val in "Today:—,7 Days:—,30 Days:—,All Time:—"|split:"," %}
+        <div class="bg-[#0f172a] rounded-xl p-5 border border-white/5">
+          <div style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#c9a84c; margin-bottom:0.5rem;">{{ label|split:":"|first }}</div>
+          <div style="font-family:'Playfair Display',serif; font-size:1.75rem; font-weight:700; color:#ffffff;">{{ analytics_today|default:0 }}</div>
+          <div style="font-size:0.7rem; color:#475569;">Page Views</div>
+        </div>
+        {% endfor %}
+        {% endfor %}
+      </div>
+
+      {# ── Main content grid ── #}
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+        {# Recent vehicles table #}
+        <div class="xl:col-span-2 bg-white rounded-xl border border-slate-100 overflow-hidden">
+          <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+            <h2 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1rem; color:#0f172a;">Recent Vehicles</h2>
+            <a href="/admin/vehicles/vehicle/" target="_blank"
+               style="font-size:0.7rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:#c9a84c;"
+               class="hover:text-[#1a1a2e] transition-colors">Manage All</a>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr style="background:#f8fafc;">
+                  <th style="text-align:left; padding:0.75rem 1.5rem; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#64748b; border-bottom:1px solid #f1f5f9;">Vehicle</th>
+                  <th style="text-align:left; padding:0.75rem 1rem; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#64748b; border-bottom:1px solid #f1f5f9;">Status</th>
+                  <th style="text-align:right; padding:0.75rem 1.5rem; font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:#64748b; border-bottom:1px solid #f1f5f9;">Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for v in recent_vehicles %}
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
+                  <td style="padding:0.875rem 1.5rem;">
+                    <div style="font-weight:600; font-size:0.85rem; color:#0f172a;">{{ v.title }}</div>
+                    <div style="font-size:0.7rem; font-family:'DM Mono',monospace; color:#94a3b8; margin-top:0.1rem;">{{ v.stock_number }}</div>
+                  </td>
+                  <td style="padding:0.875rem 1rem;">
+                    <span style="font-size:0.65rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; padding:0.2rem 0.5rem;
+                      {% if v.status == 'AVAILABLE' %}background:#ecfdf5; color:#065f46;
+                      {% elif v.status == 'RESERVED' %}background:#fffbeb; color:#92400e;
+                      {% elif v.status == 'SOLD' %}background:#fef2f2; color:#991b1b;
+                      {% else %}background:#f8fafc; color:#475569;{% endif %}">
+                      {{ v.get_status_display }}
+                    </span>
+                  </td>
+                  <td style="padding:0.875rem 1.5rem; text-align:right; font-weight:600; font-size:0.85rem; color:#0f172a; font-family:'DM Mono',monospace;">
+                    {% if v.price %}KSh {{ v.price|floatformat:0 }}{% else %}P.O.R{% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="3" style="padding:3rem 1.5rem; text-align:center; color:#94a3b8; font-size:0.875rem;">
+                    No vehicles yet. <a href="/admin/vehicles/vehicle/add/" style="color:#c9a84c; font-weight:600;">Add your first vehicle</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {# Quick stats panel #}
+        <div class="space-y-4">
+
+          {# Top makes #}
+          <div class="bg-white rounded-xl border border-slate-100 p-6">
+            <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:0.95rem; color:#0f172a; margin-bottom:1rem;">Top Makes</h3>
+            <div class="space-y-2.5">
+              {% for make in top_makes %}
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <div class="flex justify-between mb-1">
+                    <span style="font-size:0.8rem; font-weight:600; color:#374151;">{{ make.name }}</span>
+                    <span style="font-size:0.75rem; font-family:'DM Mono',monospace; color:#6b7280;">{{ make.count }}</span>
+                  </div>
+                  <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-[#c9a84c] rounded-full" style="width:{{ make.pct }}%"></div>
+                  </div>
+                </div>
+              </div>
+              {% empty %}
+              <p style="font-size:0.8rem; color:#94a3b8;">No data yet.</p>
+              {% endfor %}
+            </div>
+          </div>
+
+          {# Exchange rates #}
+          <div class="bg-white rounded-xl border border-slate-100 p-6">
+            <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:0.95rem; color:#0f172a; margin-bottom:1rem;">Exchange Rates</h3>
+            <div class="space-y-2">
+              {% for rate in exchange_rates %}
+              <div class="flex justify-between items-center py-1.5 border-b border-slate-50 last:border-0">
+                <span style="font-size:0.75rem; font-weight:700; color:#374151;">KES/{{ rate.target_currency }}</span>
+                <span style="font-size:0.75rem; font-family:'DM Mono',monospace; color:#0f172a; font-weight:600;">{{ rate.rate|floatformat:4 }}</span>
+              </div>
+              {% empty %}
+              <p style="font-size:0.8rem; color:#94a3b8;">
+                Rates not loaded yet.
+                <a href="#" style="color:#c9a84c;">Refresh</a>
+              </p>
+              {% endfor %}
+            </div>
+            {% if rate_updated_at %}
+            <p style="font-size:0.65rem; color:#94a3b8; margin-top:0.75rem;">Updated {{ rate_updated_at|timesince }} ago</p>
+            {% endif %}
+          </div>
+
+          {# Quick actions #}
+          <div class="bg-[#1a1a2e] rounded-xl p-6">
+            <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:0.95rem; color:#ffffff; margin-bottom:1rem;">Quick Actions</h3>
+            <div class="space-y-2">
+              <a href="/admin/vehicles/vehicle/add/" target="_blank"
+                 class="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-4 h-4 text-[#c9a84c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span style="font-size:0.8rem; font-weight:600; color:#e2e8f0;">Add New Vehicle</span>
+              </a>
+              <a href="/admin/vehicles/make/add/" target="_blank"
+                 class="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-4 h-4 text-[#c9a84c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+                <span style="font-size:0.8rem; font-weight:600; color:#e2e8f0;">Add Make</span>
+              </a>
+              <a href="/admin/vehicles/category/add/" target="_blank"
+                 class="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-4 h-4 text-[#c9a84c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"/></svg>
+                <span style="font-size:0.8rem; font-weight:600; color:#e2e8f0;">Add Category</span>
+              </a>
+              <a href="{% url 'catalogue:homepage' %}" target="_blank"
+                 class="flex items-center gap-3 p-3 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+                <svg class="w-4 h-4 text-[#c9a84c]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                <span style="font-size:0.8rem; font-weight:600; color:#e2e8f0;">View Live Site</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {% endblock dashboard_content %}
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

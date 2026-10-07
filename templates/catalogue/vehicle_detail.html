@@ -1,0 +1,793 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    {{ vehicle.get_seo_title }}
+{% endblock %}
+
+{% block content %}
+
+<main class="bg-[#f8f7f4] min-h-screen">
+
+    <!-- =========================================================
+         BREADCRUMB / DARK HEADER
+    ========================================================== -->
+
+    <section class="bg-[#1a1a2e]">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <nav
+                class="flex items-center gap-2 text-xs"
+                aria-label="Breadcrumb"
+            >
+
+                <a
+                    href="{% url 'catalogue:homepage' %}"
+                    class="text-[#94a3b8] hover:text-[#c9a84c] transition-colors"
+                >
+                    Home
+                </a>
+
+                <span class="text-[#475569]">/</span>
+
+                <a
+                    href="{% url 'catalogue:vehicle_list' %}"
+                    class="text-[#94a3b8] hover:text-[#c9a84c] transition-colors"
+                >
+                    Vehicles
+                </a>
+
+                <span class="text-[#475569]">/</span>
+
+                <span class="text-[#c9a84c]">
+                    {{ vehicle.title }}
+                </span>
+
+            </nav>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         MAIN VEHICLE SECTION
+    ========================================================== -->
+
+    <section class="py-10 lg:py-14">
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14">
+
+
+                <!-- =================================================
+                     IMAGE GALLERY
+                ================================================== -->
+
+                <div>
+
+                    {% if vehicle.primary_image %}
+
+                        <div class="bg-white overflow-hidden">
+
+                            <img
+                                src="{{ vehicle.primary_image.image.url }}"
+                                alt="{{ vehicle.primary_image.alt_text|default:vehicle.title }}"
+                                class="w-full aspect-[4/3] object-cover"
+                                loading="eager"
+                            >
+
+                        </div>
+
+                    {% else %}
+
+                        <div
+                            class="w-full aspect-[4/3] bg-[#e5e2db] flex items-center justify-center"
+                        >
+                            <div class="text-center">
+
+                                <svg
+                                    class="w-12 h-12 mx-auto text-[#94a3b8] mb-3"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="1.5"
+                                        d="M4 16l4.586-4.586a2 2 0 015.828 0L20 17m-6-6l1.586-1.586a2 2 0 012.828 0L20 12M14 8h.01M5 20h14a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v14a1 1 0 001 1z"
+                                    />
+                                </svg>
+
+                                <p class="text-sm text-[#64748b]">
+                                    No images available
+                                </p>
+
+                            </div>
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- Thumbnail gallery -->
+
+                    {% if vehicle.images.all %}
+
+                        <div class="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-3">
+
+                            {% for image in vehicle.images.all %}
+
+                                <div class="bg-white overflow-hidden">
+
+                                    <img
+                                        src="{{ image.image.url }}"
+                                        alt="{{ image.alt_text|default:vehicle.title }}"
+                                        class="w-full aspect-square object-cover"
+                                        loading="lazy"
+                                    >
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- =================================================
+                     VEHICLE INFORMATION
+                ================================================== -->
+
+                <div>
+
+                    <!-- Status -->
+
+                    <div class="flex flex-wrap gap-2 mb-4">
+
+                        {% if vehicle.status == "AVAILABLE" %}
+
+                            <span class="inline-flex items-center px-3 py-1 bg-green-50 text-green-700 text-xs font-bold uppercase tracking-wider">
+                                Available
+                            </span>
+
+                        {% elif vehicle.status == "RESERVED" %}
+
+                            <span class="inline-flex items-center px-3 py-1 bg-yellow-50 text-yellow-700 text-xs font-bold uppercase tracking-wider">
+                                Reserved
+                            </span>
+
+                        {% elif vehicle.status == "SOLD" %}
+
+                            <span class="inline-flex items-center px-3 py-1 bg-red-50 text-red-700 text-xs font-bold uppercase tracking-wider">
+                                Sold
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if vehicle.featured %}
+
+                            <span class="inline-flex items-center px-3 py-1 bg-[#1a1a2e] text-[#c9a84c] text-xs font-bold uppercase tracking-wider">
+                                Featured
+                            </span>
+
+                        {% endif %}
+
+
+                        {% if vehicle.new_arrival %}
+
+                            <span class="inline-flex items-center px-3 py-1 bg-[#f3efe2] text-[#8b7023] text-xs font-bold uppercase tracking-wider">
+                                New Arrival
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- Title -->
+
+                    <span class="section-label">
+                        {{ vehicle.get_condition_display }}
+                    </span>
+
+                    <h1
+                        class="mt-2"
+                        style="
+                            font-family:'Playfair Display',serif;
+                            font-weight:800;
+                            font-size:clamp(2rem,5vw,3.5rem);
+                            color:#1a1a2e;
+                            line-height:1.08;
+                        "
+                    >
+                        {{ vehicle.make.name }}
+                        {{ vehicle.model.name }}
+
+                        {% if vehicle.variant %}
+                            <span class="block text-[0.55em] mt-2 text-[#64748b]">
+                                {{ vehicle.variant }}
+                            </span>
+                        {% endif %}
+
+                    </h1>
+
+
+                    <!-- Reference -->
+
+                    <div class="mt-4 text-xs uppercase tracking-widest text-[#64748b]">
+
+                        Stock No.
+                        <span class="font-bold text-[#1a1a2e]">
+                            {{ vehicle.stock_number }}
+                        </span>
+
+                    </div>
+
+
+                    <!-- Price -->
+
+                    <div class="mt-8">
+
+                        <div class="text-xs uppercase tracking-widest font-semibold text-[#64748b]">
+                            Asking Price
+                        </div>
+
+                        <div
+                            class="mt-1"
+                            style="
+                                font-family:'Playfair Display',serif;
+                                font-size:2.25rem;
+                                font-weight:700;
+                                color:#1a1a2e;
+                            "
+                        >
+                            {{ vehicle.display_price }}
+                        </div>
+
+
+                        {% if vehicle.pricing_type == "NEGOTIABLE" %}
+
+                            <div class="mt-2">
+
+                                <span class="inline-flex items-center gap-2 text-sm font-semibold text-[#8b7023]">
+
+                                    <span class="w-2 h-2 rounded-full bg-[#c9a84c]"></span>
+
+                                    Price Negotiable
+
+                                </span>
+
+                            </div>
+
+                        {% elif vehicle.pricing_type == "FIXED" %}
+
+                            <div class="mt-2 text-sm text-[#64748b]">
+                                Fixed Price
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.is_price_reduced %}
+
+                            <div class="mt-2 text-sm text-[#64748b]">
+
+                                <span class="line-through">
+                                    Was KSh {{ vehicle.previous_price|floatformat:0 }}
+                                </span>
+
+                                <span class="ml-2 text-green-700 font-semibold">
+                                    Price Reduced
+                                </span>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         QUICK SPECS
+                    ================================================== -->
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-px bg-[#e5e2db] mt-8">
+
+                        <div class="bg-white p-5">
+
+                            <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                Year
+                            </div>
+
+                            <div class="font-semibold text-[#1a1a2e] mt-1">
+                                {{ vehicle.year }}
+                            </div>
+
+                        </div>
+
+
+                        {% if vehicle.mileage %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Mileage
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.mileage|floatformat:0 }} km
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.fuel_type %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Fuel
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.get_fuel_type_display }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.transmission %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Transmission
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.get_transmission_display }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.drivetrain %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Drivetrain
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.get_drivetrain_display }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.engine_capacity %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Engine
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.engine_capacity }}L
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.body_type %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Body
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.get_body_type_display }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+
+                        {% if vehicle.exterior_color %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="text-xs uppercase tracking-wider text-[#64748b]">
+                                    Exterior
+                                </div>
+
+                                <div class="font-semibold text-[#1a1a2e] mt-1">
+                                    {{ vehicle.exterior_color }}
+                                </div>
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- =================================================
+                         DOCUMENTATION
+                    ================================================== -->
+
+                    {% if vehicle.documentation %}
+
+                        <div class="mt-8 border border-[#e5e2db] bg-white p-6">
+
+                            <div class="flex items-center justify-between mb-5">
+
+                                <h2 class="font-bold text-[#1a1a2e]">
+                                    Documentation
+                                </h2>
+
+                                {% if vehicle.documentation.is_documents_ready %}
+
+                                    <span class="text-xs font-bold uppercase tracking-wide text-green-700">
+                                        ✓ Documents Ready
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+
+                                <!-- Logbook -->
+
+                                <div class="flex items-center justify-between p-3 bg-[#f8f7f4]">
+
+                                    <span class="text-sm text-[#64748b]">
+                                        Logbook
+                                    </span>
+
+                                    <span class="text-sm font-semibold text-[#1a1a2e]">
+                                        {{ vehicle.documentation.get_logbook_status_display }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Import documents -->
+
+                                <div class="flex items-center justify-between p-3 bg-[#f8f7f4]">
+
+                                    <span class="text-sm text-[#64748b]">
+                                        Import Documents
+                                    </span>
+
+                                    <span class="text-sm font-semibold text-[#1a1a2e]">
+                                        {{ vehicle.documentation.get_import_docs_display }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Duty -->
+
+                                <div class="flex items-center justify-between p-3 bg-[#f8f7f4]">
+
+                                    <span class="text-sm text-[#64748b]">
+                                        Duty
+                                    </span>
+
+                                    <span class="text-sm font-semibold text-[#1a1a2e]">
+                                        {{ vehicle.documentation.get_duty_status_display }}
+                                    </span>
+
+                                </div>
+
+
+                                <!-- Transfer -->
+
+                                <div class="flex items-center justify-between p-3 bg-[#f8f7f4]">
+
+                                    <span class="text-sm text-[#64748b]">
+                                        Transfer
+                                    </span>
+
+                                    <span class="text-sm font-semibold text-[#1a1a2e]">
+                                        {{ vehicle.documentation.get_transfer_status_display }}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================================
+                         VERIFICATION
+                    ================================================== -->
+
+                    {% if vehicle.verification %}
+
+                        <div class="mt-4 border border-[#e5e2db] bg-white p-6">
+
+                            <h2 class="font-bold text-[#1a1a2e] mb-5">
+                                Vehicle Verification
+                            </h2>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+
+                                {% if vehicle.verification.is_inspected %}
+
+                                    <div class="p-3 bg-green-50 text-green-800 text-sm font-semibold">
+                                        ✓ Inspected
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if vehicle.verification.is_mileage_verified %}
+
+                                    <div class="p-3 bg-blue-50 text-blue-800 text-sm font-semibold">
+                                        ✓ Mileage Verified
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% if vehicle.verification.is_document_verified %}
+
+                                    <div class="p-3 bg-purple-50 text-purple-800 text-sm font-semibold">
+                                        ✓ Documents Verified
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+
+                    <!-- =================================================
+                         WHATSAPP CTA
+                    ================================================== -->
+
+                    {% if vehicle.status == "AVAILABLE" %}
+
+                        <div class="mt-8">
+
+                            <a
+                                href="https://wa.me/{{ WHATSAPP_BUSINESS_NUMBER }}?text={{ whatsapp_message|urlencode }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="block w-full text-center bg-[#1a1a2e] hover:bg-[#252545] text-white px-6 py-4 font-semibold transition-colors"
+                            >
+                                Enquire About This Vehicle on WhatsApp
+                            </a>
+
+                            <p class="text-center text-xs text-[#64748b] mt-3">
+                                Reference: {{ vehicle.stock_number }}
+                            </p>
+
+                        </div>
+
+                    {% elif vehicle.status == "RESERVED" %}
+
+                        <div class="mt-8 bg-yellow-50 border border-yellow-200 p-5 text-center">
+
+                            <div class="font-bold text-yellow-800">
+                                Vehicle Reserved
+                            </div>
+
+                            <p class="text-sm text-yellow-700 mt-1">
+                                Contact us to check whether this vehicle becomes available.
+                            </p>
+
+                        </div>
+
+                    {% elif vehicle.status == "SOLD" %}
+
+                        <div class="mt-8 bg-red-50 border border-red-200 p-5 text-center">
+
+                            <div class="font-bold text-red-800">
+                                Vehicle Sold
+                            </div>
+
+                            <p class="text-sm text-red-700 mt-1">
+                                Browse our current inventory for similar vehicles.
+                            </p>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================================================
+                 DESCRIPTION
+            ========================================================== -->
+
+            {% if vehicle.description %}
+
+                <section class="mt-16 max-w-4xl">
+
+                    <span class="section-label">
+                        Vehicle Details
+                    </span>
+
+                    <h2 class="section-title mt-2 mb-5">
+                        About This Vehicle
+                    </h2>
+
+                    <div class="divider-gold mb-6"></div>
+
+                    <div class="text-[#4b5563] leading-8">
+                        {{ vehicle.description|linebreaks }}
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+            <!-- =========================================================
+                 FEATURES
+            ========================================================== -->
+
+            {% if vehicle.features.all %}
+
+                <section class="mt-16">
+
+                    <span class="section-label">
+                        Equipment
+                    </span>
+
+                    <h2 class="section-title mt-2 mb-5">
+                        Features & Equipment
+                    </h2>
+
+                    <div class="divider-gold mb-8"></div>
+
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[#e5e2db]">
+
+                        {% for feature in vehicle.features.all %}
+
+                            <div class="bg-white p-5">
+
+                                <div class="font-semibold text-[#1a1a2e] text-sm">
+                                    {{ feature.name }}
+                                </div>
+
+                                {% if feature.category %}
+
+                                    <div class="text-xs text-[#94a3b8] mt-1">
+                                        {{ feature.category }}
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+            <!-- =========================================================
+                 LOCATION
+            ========================================================== -->
+
+            {% if vehicle.location %}
+
+                <section class="mt-16">
+
+                    <div class="bg-[#1a1a2e] p-8 lg:p-10">
+
+                        <span class="section-label text-[#c9a84c]">
+                            Vehicle Location
+                        </span>
+
+                        <h2
+                            class="mt-2"
+                            style="
+                                font-family:'Playfair Display',serif;
+                                font-size:1.8rem;
+                                font-weight:700;
+                                color:white;
+                            "
+                        >
+                            Available in {{ vehicle.location }}
+                        </h2>
+
+                        <p class="text-[#94a3b8] text-sm mt-3">
+                            Contact Grandpa Motors to arrange a viewing.
+                        </p>
+
+                    </div>
+
+                </section>
+
+            {% endif %}
+
+
+            <!-- =========================================================
+                 BOTTOM CTA
+            ========================================================== -->
+
+            <section class="mt-16 bg-white border border-[#e5e2db] p-8 lg:p-10 text-center">
+
+                <span class="section-label">
+                    Interested?
+                </span>
+
+                <h2 class="section-title mt-2">
+                    Want to Know More?
+                </h2>
+
+                <p class="text-[#64748b] max-w-2xl mx-auto mt-4 leading-7">
+                    Contact Grandpa Motors directly for availability,
+                    additional photos, viewing arrangements and
+                    purchase information.
+                </p>
+
+                {% if vehicle.status == "AVAILABLE" %}
+
+                    <div class="mt-6">
+
+                        <a
+                            href="https://wa.me/{{ WHATSAPP_BUSINESS_NUMBER }}?text={{ whatsapp_message|urlencode }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="btn-accent inline-flex"
+                        >
+                            Chat on WhatsApp
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+    </section>
+
+</main>
+
+{% endblock %}

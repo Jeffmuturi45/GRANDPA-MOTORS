@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+  {# ── SEO ── #}
+  <title>{% block title %}{{ page_title|default:"Grandpa Motors — Premium Vehicles in Kenya" }}{% endblock %}</title>
+  <meta name="description" content="{{ meta_description|default:"Grandpa Motors offers quality new and used vehicles in Kenya. Browse SUVs, sedans, pickups and more. Verified documentation, transparent pricing, direct WhatsApp contact." }}" />
+  {% if canonical_url %}
+  <link rel="canonical" href="{{ canonical_url }}" />
+  {% else %}
+  <link rel="canonical" href="{{ request.build_absolute_uri }}" />
+  {% endif %}
+
+  {# ── Open Graph ── #}
+  <meta property="og:type"        content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:site_name"   content="Grandpa Motors" />
+  <meta property="og:title"       content="{{ page_title|default:"Grandpa Motors — Premium Vehicles in Kenya" }}" />
+  <meta property="og:description" content="{{ meta_description|default:"Quality vehicles in Kenya. Transparent pricing, verified documentation." }}" />
+  <meta property="og:url"         content="{{ canonical_url|default:request.build_absolute_uri }}" />
+  {% if og_image %}
+  <meta property="og:image"       content="{{ og_image }}" />
+  <meta property="og:image:width"  content="1200" />
+  <meta property="og:image:height" content="630" />
+  {% endif %}
+
+  {# ── Twitter / X Card ── #}
+  <meta name="twitter:card"        content="summary_large_image" />
+  <meta name="twitter:title"       content="{{ page_title|default:"Grandpa Motors" }}" />
+  <meta name="twitter:description" content="{{ meta_description|default:"Quality vehicles in Kenya." }}" />
+  {% if og_image %}
+  <meta name="twitter:image" content="{{ og_image }}" />
+  {% endif %}
+
+  {# ── Robots ── #}
+  <meta name="robots" content="{% block robots %}index, follow{% endblock %}" />
+
+  {# ── Fonts — preconnect first, then load ── #}
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=DM+Mono:wght@500&display=swap" rel="stylesheet" />
+
+  {# ── CSS ── #}
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/main.css' %}" />
+
+  {# ── Favicon — inline SVG for zero extra request ── #}
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%231a1a2e'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='18' font-family='serif' fill='%23c9a84c'>G</text></svg>" />
+
+  {# ── Alpine.js — defer, non-blocking ── #}
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  {# ── JSON-LD Organisation ── #}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "AutomotiveBusiness",
+    "name": "Grandpa Motors",
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "telephone": "{{ DEALERSHIP_PHONE }}",
+    "email": "{{ DEALERSHIP_EMAIL }}",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Nairobi",
+      "addressCountry": "KE"
+    },
+    "sameAs": []
+  }
+  </script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+
+<body
+  class="bg-[#f8f7f4] text-[#1c1c1c] min-h-screen flex flex-col"
+  x-data="{ mobileMenuOpen: false }"
+>
+
+  {% include "includes/navbar.html" %}
+
+  {# Flash messages #}
+  {% if messages %}
+  <div class="fixed top-20 right-4 z-[60] space-y-2 max-w-sm w-full px-4" x-data>
+    {% for message in messages %}
+    <div
+      x-data="{ show: true }" x-show="show" x-transition
+      x-init="setTimeout(() => show = false, 4500)"
+      class="p-4 text-sm font-medium shadow-lg border-l-4
+             {% if message.tags == 'error' %}bg-red-50 border-red-500 text-red-800
+             {% elif message.tags == 'success' %}bg-emerald-50 border-emerald-500 text-emerald-800
+             {% else %}bg-blue-50 border-blue-500 text-blue-800{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% include "includes/footer.html" %}
+
+  {# WhatsApp FAB #}
+  {% block whatsapp_fab %}
+  <a
+    href="https://wa.me/{{ WHATSAPP_BUSINESS_NUMBER }}"
+    target="_blank"
+    rel="noopener noreferrer"
+    class="fixed bottom-6 right-6 z-40 w-14 h-14 bg-[#25d366] hover:bg-[#1ebe5d]
+           shadow-2xl flex items-center justify-center transition-all duration-200
+           hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#25d366]/40"
+    aria-label="Chat with Grandpa Motors on WhatsApp"
+    title="Chat on WhatsApp"
+  >
+    <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+  {% endblock %}
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

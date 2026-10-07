@@ -1,0 +1,1189 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Grandpa Motors — Quality Vehicles for Sale in Kenya{% endblock %}
+
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "Grandpa Motors",
+  "url": "{{ request.scheme }}://{{ request.get_host }}",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "{{ request.scheme }}://{{ request.get_host }}/vehicles/?q={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+
+<section class="relative overflow-hidden bg-[#1a1a2e]" style="min-height: 92vh;">
+
+  {# Background image layer #}
+  <div class="absolute inset-0">
+    <div class="absolute inset-0 bg-gradient-to-r from-[#1a1a2e] via-[#1a1a2e]/90 to-[#1a1a2e]/60 z-10"></div>
+
+    {# Pattern overlay #}
+    <div class="absolute inset-0 opacity-5 z-10"
+         style="background-image: repeating-linear-gradient(45deg, #c9a84c 0, #c9a84c 1px, transparent 0, transparent 50%); background-size: 30px 30px;">
+    </div>
+  </div>
+
+  <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center"
+       style="min-height: 92vh; padding-top: 6rem; padding-bottom: 6rem;">
+
+    <div class="max-w-2xl">
+
+      {# Pre-headline label #}
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-8 h-px bg-[#c9a84c]"></div>
+
+        <span class="section-label text-[#c9a84c] mb-0 tracking-[0.25em]">
+          Nairobi's Trusted Dealership
+        </span>
+      </div>
+
+      <h1
+        style="font-family:'Playfair Display',Georgia,serif; font-weight:800; font-size:clamp(2.5rem,6vw,4.5rem); line-height:1.05; letter-spacing:-0.02em; color:#ffffff;"
+        class="mb-6"
+      >
+        Find the Vehicle<br/>
+        <span style="color:#c9a84c;">You Can Trust.</span>
+      </h1>
+
+      <p
+        style="font-family:'Plus Jakarta Sans',sans-serif; font-size:1.1rem; color:#94a3b8; line-height:1.75; max-width:36rem;"
+        class="mb-10"
+      >
+        Grandpa Motors connects Kenyan buyers with verified, document-ready vehicles.
+        Every listing is inspected, accurately priced, and contactable directly — no middlemen.
+      </p>
+
+      {# Search bar #}
+      <form action="{% url 'catalogue:vehicle_list' %}" method="get" class="mb-8">
+
+        <div class="flex flex-col sm:flex-row gap-0 max-w-xl">
+
+          <div class="relative flex-1">
+
+            <svg
+              class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6b7280] pointer-events-none"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+
+            <input
+              type="search"
+              name="q"
+              placeholder="Search by make, model, or keyword..."
+              class="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 text-white
+                     placeholder-[#64748b] focus:outline-none focus:border-[#c9a84c] focus:bg-white/15
+                     text-sm transition-all"
+              autocomplete="off"
+            />
+
+          </div>
+
+          <button
+            type="submit"
+            class="bg-[#c9a84c] hover:bg-[#b8963e] text-[#1a1a2e] font-bold
+                   px-8 py-4 text-sm uppercase tracking-widest transition-colors whitespace-nowrap flex-shrink-0"
+          >
+            Search
+          </button>
+
+        </div>
+
+      </form>
+
+      {# Quick links #}
+      <div class="flex flex-wrap gap-2">
+
+        <span
+          style="font-family:'Plus Jakarta Sans',sans-serif; font-size:0.75rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; display:flex; align-items:center;"
+        >
+          Popular:
+        </span>
+
+        {% for make in nav_makes|slice:":5" %}
+
+        <a
+          href="{% url 'catalogue:by_make' make.slug %}"
+          class="px-3 py-1 border border-white/20 text-white/70 hover:border-[#c9a84c] hover:text-[#c9a84c]
+                 text-xs font-medium uppercase tracking-wider transition-colors"
+        >
+          {{ make.name }}
+        </a>
+
+        {% endfor %}
+
+      </div>
+
+    </div>
+
+    {# Hero stats — bottom right #}
+    {% if stats %}
+
+    <div class="absolute bottom-8 right-4 sm:right-8 hidden md:flex items-end gap-8">
+
+      <div class="text-right">
+
+        <div
+          style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:#c9a84c; line-height:1;"
+        >
+          {{ stats.available|default:0 }}
+        </div>
+
+        <div
+          style="font-size:0.65rem; letter-spacing:0.15em; color:#64748b; font-weight:600; text-transform:uppercase;"
+        >
+          Available
+        </div>
+
+      </div>
+
+      <div class="w-px h-10 bg-white/10"></div>
+
+      <div class="text-right">
+
+        <div
+          style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:#c9a84c; line-height:1;"
+        >
+          {{ stats.featured|default:0 }}
+        </div>
+
+        <div
+          style="font-size:0.65rem; letter-spacing:0.15em; color:#64748b; font-weight:600; text-transform:uppercase;"
+        >
+          Featured
+        </div>
+
+      </div>
+
+      <div class="w-px h-10 bg-white/10"></div>
+
+      <div class="text-right">
+
+        <div
+          style="font-family:'Playfair Display',serif; font-size:2rem; font-weight:700; color:#c9a84c; line-height:1;"
+        >
+          {{ stats.new_arrivals|default:0 }}
+        </div>
+
+        <div
+          style="font-size:0.65rem; letter-spacing:0.15em; color:#64748b; font-weight:600; text-transform:uppercase;"
+        >
+          New Arrivals
+        </div>
+
+      </div>
+
+    </div>
+
+    {% endif %}
+
+  </div>
+
+</section>
+
+
+
+
+<section class="bg-white border-b border-[#e5e2db]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex overflow-x-auto no-scrollbar">
+
+      {# split removed — same tabs, same URLs #}
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}"
+        class="flex-shrink-0 px-6 py-4 text-sm font-semibold uppercase tracking-widest transition-colors whitespace-nowrap border-b-2
+               border-[#c9a84c] text-[#1a1a2e]"
+      >
+        All Vehicles
+      </a>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?condition=NEW"
+        class="flex-shrink-0 px-6 py-4 text-sm font-semibold uppercase tracking-widest transition-colors whitespace-nowrap border-b-2
+               border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]"
+      >
+        New
+      </a>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?condition=FOREIGN_USED"
+        class="flex-shrink-0 px-6 py-4 text-sm font-semibold uppercase tracking-widest transition-colors whitespace-nowrap border-b-2
+               border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]"
+      >
+        Foreign Used
+      </a>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?condition=LOCALLY_USED"
+        class="flex-shrink-0 px-6 py-4 text-sm font-semibold uppercase tracking-widest transition-colors whitespace-nowrap border-b-2
+               border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]"
+      >
+        Locally Used
+      </a>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?condition=RECONDITIONED"
+        class="flex-shrink-0 px-6 py-4 text-sm font-semibold uppercase tracking-widest transition-colors whitespace-nowrap border-b-2
+               border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]"
+      >
+        Reconditioned
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+{% if featured_vehicles %}
+
+<section class="py-16 lg:py-20 bg-[#f8f7f4]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex items-end justify-between mb-10">
+
+      <div>
+
+        <span class="section-label">
+          Hand-Picked Selection
+        </span>
+
+        <h2 class="section-title">
+          Featured Vehicles
+        </h2>
+
+        <div class="divider-gold mt-3"></div>
+
+      </div>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?featured=1"
+        class="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[#c9a84c] hover:text-[#1a1a2e] transition-colors"
+      >
+        View All
+
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+
+      </a>
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-[#e5e2db]">
+
+      {% for vehicle in featured_vehicles %}
+
+      {% include "includes/vehicle_card.html" %}
+
+      {% empty %}
+
+      <div class="col-span-4 bg-white text-center py-16 text-[#9ca3af]">
+
+        <p class="font-medium">
+          No featured vehicles at this time. Check back soon.
+        </p>
+
+        <a
+          href="{% url 'catalogue:vehicle_list' %}"
+          class="mt-4 inline-block btn-outline"
+        >
+          Browse All Vehicles
+        </a>
+
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+
+<section class="py-16 lg:py-20 bg-[#1a1a2e]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-12">
+
+      <span class="section-label">
+        Why Grandpa Motors
+      </span>
+
+      <h2
+        style="font-family:'Playfair Display',serif; font-size:clamp(1.75rem,4vw,2.75rem); font-weight:700; color:#ffffff; line-height:1.2;"
+      >
+        The Standard for Vehicle Sales<br/>
+        in Kenya
+      </h2>
+
+      <div class="divider-gold mx-auto mt-4"></div>
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-white/10">
+
+      {% for item in trust_pillars %}
+
+      <div class="bg-[#1a1a2e] p-8 hover:bg-[#16213e] transition-colors group">
+
+        <div class="w-10 h-10 border border-[#c9a84c] flex items-center justify-center mb-5 group-hover:bg-[#c9a84c] transition-colors">
+          {{ item.icon_svg|safe }}
+        </div>
+
+        <h3
+          style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.1rem; color:#ffffff; margin-bottom:0.5rem;"
+        >
+          {{ item.title }}
+        </h3>
+
+        <p
+          style="font-size:0.875rem; color:#94a3b8; line-height:1.65;"
+        >
+          {{ item.description }}
+        </p>
+
+      </div>
+
+      {% empty %}
+
+      {# Static fallback if context var not set #}
+
+      {% for i in "1234" %}
+
+      <div class="bg-[#1a1a2e] p-8 hover:bg-[#16213e] transition-colors group">
+
+        <div class="w-10 h-10 border border-[#c9a84c] flex items-center justify-center mb-5">
+
+          {% if forloop.counter == 1 %}
+
+          <svg
+            class="w-5 h-5 text-[#c9a84c]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+
+          {% elif forloop.counter == 2 %}
+
+          <svg
+            class="w-5 h-5 text-[#c9a84c]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+
+          {% elif forloop.counter == 3 %}
+
+          <svg
+            class="w-5 h-5 text-[#c9a84c]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+            />
+          </svg>
+
+          {% else %}
+
+          <svg
+            class="w-5 h-5 text-[#c9a84c]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+            />
+          </svg>
+
+          {% endif %}
+
+        </div>
+
+        <h3
+          style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.05rem; color:#ffffff; margin-bottom:0.5rem;"
+        >
+
+          {% if forloop.counter == 1 %}
+            Verified Documentation
+          {% elif forloop.counter == 2 %}
+            Transparent History
+          {% elif forloop.counter == 3 %}
+            Secure Transactions
+          {% else %}
+            Direct Communication
+          {% endif %}
+
+        </h3>
+
+        <p
+          style="font-size:0.875rem; color:#94a3b8; line-height:1.65;"
+        >
+
+          {% if forloop.counter == 1 %}
+            Every vehicle is checked for complete, authentic paperwork before it's listed.
+          {% elif forloop.counter == 2 %}
+            Full disclosure on condition, mileage, and pricing — no hidden surprises.
+          {% elif forloop.counter == 3 %}
+            Your purchase journey is safe, straightforward, and fully documented.
+          {% else %}
+            Speak directly with our team on WhatsApp. No call centers, no delays.
+          {% endif %}
+
+        </p>
+
+      </div>
+
+      {% endfor %}
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+
+{% if latest_arrivals %}
+
+<section class="py-16 lg:py-20 bg-white">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex items-end justify-between mb-10">
+
+      <div>
+
+        <span class="section-label">
+          Just Added
+        </span>
+
+        <h2 class="section-title">
+          Latest Arrivals
+        </h2>
+
+        <div class="divider-gold mt-3"></div>
+
+      </div>
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}?new_arrival=1"
+        class="hidden sm:inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-[#c9a84c] hover:text-[#1a1a2e] transition-colors"
+      >
+        View All
+
+        <svg
+          class="w-4 h-4"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 5l7 7-7 7"
+          />
+        </svg>
+
+      </a>
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-[#e5e2db]">
+
+      {% for vehicle in latest_arrivals %}
+
+      {% include "includes/vehicle_card.html" %}
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+
+{% if all_categories %}
+
+<section class="py-16 lg:py-20 bg-[#f8f7f4]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-10">
+
+      <span class="section-label">
+        Explore
+      </span>
+
+      <h2 class="section-title">
+        Browse by Category
+      </h2>
+
+      <div class="divider-gold mx-auto mt-3"></div>
+
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px bg-[#e5e2db]">
+
+      {% for cat in all_categories %}
+
+      <a
+        href="{{ cat.get_absolute_url }}"
+        class="bg-white p-6 text-center hover:bg-[#1a1a2e] group transition-colors"
+      >
+
+        <div class="w-10 h-10 border border-[#e5e2db] group-hover:border-[#c9a84c] mx-auto flex items-center justify-center mb-4 transition-colors">
+
+          <svg
+            class="w-5 h-5 text-[#c9a84c]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M5 13l4 4L19 7"
+            />
+          </svg>
+
+        </div>
+
+        <div
+          style="font-family:'Playfair Display',serif; font-weight:700; font-size:0.9rem; color:#1a1a2e;"
+          class="group-hover:text-white transition-colors"
+        >
+          {{ cat.name }}
+        </div>
+
+        {% if cat.vehicle_count %}
+
+        <div
+          style="font-size:0.7rem; letter-spacing:0.12em; font-weight:600; text-transform:uppercase;"
+          class="text-[#9ca3af] group-hover:text-[#c9a84c] mt-1 transition-colors"
+        >
+          {{ cat.vehicle_count }} vehicles
+        </div>
+
+        {% endif %}
+
+      </a>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+
+{% if all_makes %}
+
+<section class="py-16 lg:py-20 bg-white">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex items-end justify-between mb-10">
+
+      <div>
+
+        <span class="section-label">
+          Top Brands
+        </span>
+
+        <h2 class="section-title">
+          Browse by Make
+        </h2>
+
+        <div class="divider-gold mt-3"></div>
+
+      </div>
+
+    </div>
+
+    <div class="flex flex-wrap gap-2">
+
+      {% for make in all_makes %}
+
+      <a
+        href="{{ make.get_absolute_url }}"
+        class="group px-5 py-3 border border-[#e5e2db] bg-[#f8f7f4] hover:bg-[#1a1a2e] hover:border-[#1a1a2e] transition-all"
+      >
+
+        <span
+          style="font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.1em;"
+          class="text-[#374151] group-hover:text-white transition-colors"
+        >
+          {{ make.name }}
+        </span>
+
+        {% if make.vehicle_count %}
+
+        <span
+          style="font-size:0.7rem;"
+          class="text-[#9ca3af] group-hover:text-[#c9a84c] ml-1.5 transition-colors"
+        >
+          ({{ make.vehicle_count }})
+        </span>
+
+        {% endif %}
+
+      </a>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+
+{% if price_reduced %}
+
+<section class="py-16 lg:py-20 bg-[#f8f7f4]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="flex items-end justify-between mb-10">
+
+      <div>
+
+        <span
+          class="section-label"
+          style="color:#dc2626;"
+        >
+          Price Reductions
+        </span>
+
+        <h2 class="section-title">
+          Special Offers
+        </h2>
+
+        <div class="w-12 h-0.5 bg-red-500 mt-3"></div>
+
+      </div>
+
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e5e2db]">
+
+      {% for vehicle in price_reduced %}
+
+      {% include "includes/vehicle_card.html" %}
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endif %}
+
+
+<section class="py-16 lg:py-20 bg-[#1a1a2e]">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-12">
+
+      <span class="section-label">
+        Client Stories
+      </span>
+
+      <h2
+        style="font-family:'Playfair Display',serif; font-size:clamp(1.75rem,4vw,2.75rem); font-weight:700; color:#ffffff;"
+      >
+        What Our Clients Say
+      </h2>
+
+      <div class="divider-gold mx-auto mt-4"></div>
+
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/10">
+
+      {% for testimonial in testimonials %}
+
+      <div class="bg-[#1a1a2e] p-8">
+
+        <div class="flex gap-0.5 mb-5">
+
+          {% for i in "12345" %}
+
+          <svg
+            class="w-4 h-4 fill-[#c9a84c]"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+
+          {% endfor %}
+
+        </div>
+
+        <blockquote
+          style="font-family:'Playfair Display',serif; font-style:italic; color:#e2e8f0; line-height:1.7; font-size:1rem; margin-bottom:1.5rem;"
+        >
+          "{{ testimonial.text }}"
+        </blockquote>
+
+        <div class="border-t border-white/10 pt-4">
+
+          <div
+            style="font-weight:700; color:#ffffff; font-size:0.875rem;"
+          >
+            {{ testimonial.name }}
+          </div>
+
+          <div
+            style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;"
+          >
+            {{ testimonial.vehicle }}
+          </div>
+
+        </div>
+
+      </div>
+
+      {% empty %}
+
+      {# Static testimonials as fallback — split removed #}
+
+      {% for t in "123" %}
+
+      <div class="bg-[#1a1a2e] p-8 hover:bg-[#16213e] transition-colors">
+
+        <div class="flex gap-0.5 mb-5">
+
+          {% for i in "12345" %}
+
+          <svg
+            class="w-4 h-4 fill-[#c9a84c]"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+          </svg>
+
+          {% endfor %}
+
+        </div>
+
+        <blockquote
+          style="font-family:'Playfair Display',serif; font-style:italic; color:#e2e8f0; line-height:1.7; font-size:1rem; margin-bottom:1.5rem;"
+        >
+
+          {% if forloop.counter == 1 %}
+            "The process was straightforward and every document was in order on collection day. I appreciated the transparency throughout."
+          {% elif forloop.counter == 2 %}
+            "I contacted them on WhatsApp in the morning and had a test drive arranged by afternoon. The vehicle matched the listing exactly."
+          {% else %}
+            "Grandpa Motors listed the duty status clearly — what you see is what you get. I have bought two vehicles here and will return."
+          {% endif %}
+
+        </blockquote>
+
+        <div class="border-t border-white/10 pt-4">
+
+          <div
+            style="font-weight:700; color:#ffffff; font-size:0.875rem;"
+          >
+            {% if forloop.counter == 1 %}
+              James M.
+            {% elif forloop.counter == 2 %}
+              Wanjiru K.
+            {% else %}
+              David O.
+            {% endif %}
+          </div>
+
+          <div
+            style="font-size:0.75rem; color:#64748b; letter-spacing:0.05em;"
+          >
+            {% if forloop.counter == 1 %}
+              Toyota Land Cruiser Prado, 2022
+            {% elif forloop.counter == 2 %}
+              BMW X5, 2021
+            {% else %}
+              Subaru Forester, 2020
+            {% endif %}
+          </div>
+
+        </div>
+
+      </div>
+
+      {% endfor %}
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="py-16 lg:py-20 bg-white">
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+      <div>
+
+        <span class="section-label">
+          Our Process
+        </span>
+
+        <h2 class="section-title mb-4">
+          Every Vehicle Arrives<br/>
+          Document-Ready
+        </h2>
+
+        <div class="divider-gold mb-6"></div>
+
+        <p class="section-subtitle mb-8">
+          We disclose the logbook status, import documents, duty payment, and transfer readiness on every listing — before you ask. No follow-up required.
+        </p>
+
+        <div class="space-y-4">
+
+          {% for step in doc_steps %}
+
+          <div class="flex gap-4 items-start">
+
+            <div class="w-8 h-8 bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 mt-0.5">
+
+              <span
+                style="font-family:'DM Mono',monospace; font-size:0.7rem; font-weight:500; color:#c9a84c;"
+              >
+                0{{ forloop.counter }}
+              </span>
+
+            </div>
+
+            <div>
+
+              <div
+                style="font-weight:700; font-size:0.875rem; color:#1a1a2e;"
+              >
+                {{ step.title }}
+              </div>
+
+              <div
+                style="font-size:0.8rem; color:#6b7280; margin-top:0.25rem;"
+              >
+                {{ step.description }}
+              </div>
+
+            </div>
+
+          </div>
+
+          {% empty %}
+
+          {% for step in "1234" %}
+
+          <div class="flex gap-4 items-start">
+
+            <div class="w-8 h-8 bg-[#1a1a2e] flex items-center justify-center flex-shrink-0 mt-0.5">
+
+              <span
+                style="font-family:'DM Mono',monospace; font-size:0.7rem; font-weight:500; color:#c9a84c;"
+              >
+                0{{ forloop.counter }}
+              </span>
+
+            </div>
+
+            <div>
+
+              <div
+                style="font-weight:700; font-size:0.875rem; color:#1a1a2e;"
+              >
+
+                {% if forloop.counter == 1 %}
+                  Logbook Verification
+                {% elif forloop.counter == 2 %}
+                  Import Documents Check
+                {% elif forloop.counter == 3 %}
+                  Duty Status Confirmed
+                {% else %}
+                  Transfer Readiness
+                {% endif %}
+
+              </div>
+
+              <div
+                style="font-size:0.8rem; color:#6b7280; margin-top:0.25rem;"
+              >
+
+                {% if forloop.counter == 1 %}
+                  We confirm the original logbook is present, authentic, and matches the chassis.
+                {% elif forloop.counter == 2 %}
+                  All import paperwork is reviewed and disclosed on the listing.
+                {% elif forloop.counter == 3 %}
+                  Duty payment status is displayed clearly — Paid, Processing, or Not Applicable.
+                {% else %}
+                  We confirm the vehicle is ready for ownership transfer before listing.
+                {% endif %}
+
+              </div>
+
+            </div>
+
+          </div>
+
+          {% endfor %}
+
+          {% endfor %}
+
+        </div>
+
+        <div class="mt-8">
+
+          <a
+            href="{% url 'catalogue:vehicle_list' %}?docs_ready=1"
+            class="btn-primary"
+          >
+            Browse Verified Vehicles
+          </a>
+
+        </div>
+
+      </div>
+
+
+      <div class="bg-[#f8f7f4] p-8 lg:p-10 border border-[#e5e2db]">
+
+        <div
+          style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#1a1a2e; margin-bottom:1.5rem;"
+        >
+          Documentation Badges
+        </div>
+
+        <div class="space-y-3">
+
+          {% for badge in doc_badge_examples %}
+
+          <div class="flex items-center gap-3 p-3 bg-white border border-[#e5e2db]">
+
+            <div class="w-6 h-6 bg-emerald-600 flex items-center justify-center flex-shrink-0">
+
+              <svg
+                class="w-3.5 h-3.5 fill-white"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+
+            </div>
+
+            <span
+              style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#1a1a2e;"
+            >
+              {{ badge }}
+            </span>
+
+          </div>
+
+          {% empty %}
+
+          {% for badge_number in "123456" %}
+
+          <div class="flex items-center gap-3 p-3 bg-white border border-[#e5e2db]">
+
+            <div class="w-6 h-6 bg-emerald-600 flex items-center justify-center flex-shrink-0">
+
+              <svg
+                class="w-3.5 h-3.5 fill-white"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+
+            </div>
+
+            <span
+              style="font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:#1a1a2e;"
+            >
+
+              {% if forloop.counter == 1 %}
+                Documents Ready
+              {% elif forloop.counter == 2 %}
+                Duty Paid
+              {% elif forloop.counter == 3 %}
+                Transfer Ready
+              {% elif forloop.counter == 4 %}
+                Inspected
+              {% elif forloop.counter == 5 %}
+                Mileage Verified
+              {% else %}
+                Documents Verified
+              {% endif %}
+
+            </span>
+
+          </div>
+
+          {% endfor %}
+
+          {% endfor %}
+
+        </div>
+
+        <p
+          style="font-size:0.75rem; color:#9ca3af; margin-top:1rem; line-height:1.6;"
+        >
+          These badges appear on each vehicle listing and reflect verified information only.
+          We do not display a badge unless the status has been confirmed.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<section class="py-14 bg-[#c9a84c]">
+
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+    <h2
+      style="font-family:'Playfair Display',serif; font-size:clamp(1.5rem,4vw,2.25rem); font-weight:700; color:#1a1a2e; line-height:1.25; margin-bottom:1rem;"
+    >
+      Ready to Find Your Vehicle?
+    </h2>
+
+    <p
+      style="font-size:0.9rem; color:#78350f; max-width:32rem; margin:0 auto 2rem; line-height:1.7;"
+    >
+      Browse our full inventory online, or message our team directly on WhatsApp.
+      We respond fast and can arrange viewings the same day.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+
+      <a
+        href="{% url 'catalogue:vehicle_list' %}"
+        class="inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-[#1a1a2e] hover:bg-[#16213e] text-white text-xs font-bold uppercase tracking-widest transition-colors"
+      >
+        Browse Inventory
+      </a>
+
+      <a
+        href="https://wa.me/{{ WHATSAPP_BUSINESS_NUMBER }}"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 bg-white hover:bg-[#f8f7f4] text-[#1a1a2e] text-xs font-bold uppercase tracking-widest transition-colors"
+      >
+
+        <svg
+          class="w-4 h-4 fill-[#25d366]"
+          viewBox="0 0 24 24"
+        >
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+
+        Chat on WhatsApp
+
+      </a>
+
+    </div>
+
+  </div>
+
+</section>
+
+{% endblock %}

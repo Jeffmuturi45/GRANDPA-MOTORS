@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}{{ make.name }} Vehicles for Sale in Kenya — Grandpa Motors{% endblock %}
+{% block extra_head %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "{{ make.name }} Vehicles at Grandpa Motors",
+  "description": "Browse {{ total_count }} {{ make.name }} vehicles available for sale in Kenya at Grandpa Motors.",
+  "url": "{{ request.build_absolute_uri }}"
+}
+</script>
+{% endblock %}
+
+{% block content %}
+
+{# ── Page Header ── #}
+<div class="bg-[#1a1a2e] border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    {# Breadcrumb #}
+    <nav class="flex items-center gap-2 text-xs mb-5" aria-label="Breadcrumb">
+      <a href="{% url 'catalogue:homepage' %}" class="text-[#64748b] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors">Home</a>
+      <svg class="w-3 h-3 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <a href="{% url 'catalogue:vehicle_list' %}" class="text-[#64748b] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors">Vehicles</a>
+      <svg class="w-3 h-3 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <span class="text-[#c9a84c] font-semibold uppercase tracking-wide">{{ make.name }}</span>
+    </nav>
+
+    <div class="flex items-end justify-between">
+      <div>
+        <span class="section-label text-[#c9a84c]">Make</span>
+        <h1 style="font-family:'Playfair Display',serif; font-weight:800; font-size:clamp(2rem,5vw,3rem); color:#ffffff; line-height:1.1;">
+          {{ make.name }} Vehicles
+        </h1>
+        <p style="color:#94a3b8; font-size:0.9rem; margin-top:0.5rem;">
+          {{ total_count|intcomma }} vehicle{{ total_count|pluralize }} available in Kenya
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ── Models quick-filter bar ── #}
+{% if make_models %}
+<div class="bg-white border-b border-[#e5e2db] sticky top-16 z-20">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-0 overflow-x-auto no-scrollbar">
+      <a href="{% url 'catalogue:by_make' make.slug %}"
+         class="flex-shrink-0 px-5 py-3.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-colors
+                border-[#c9a84c] text-[#1a1a2e]">
+        All Models
+      </a>
+      {% for m in make_models %}
+      <a href="{% url 'catalogue:vehicle_list' %}?make={{ make.slug }}&model={{ m.slug }}"
+         class="flex-shrink-0 px-5 py-3.5 text-xs font-semibold uppercase tracking-widest border-b-2 transition-colors whitespace-nowrap
+                border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]">
+        {{ m.name }}
+        {% if m.vehicle_count %}
+        <span style="font-size:0.6rem;" class="text-[#9ca3af] ml-1">({{ m.vehicle_count }})</span>
+        {% endif %}
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{# ── Content ── #}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="flex gap-6">
+
+    {# Filter sidebar #}
+    <aside class="hidden lg:block w-64 flex-shrink-0">
+      {% include "includes/filter_sidebar.html" %}
+    </aside>
+
+    <div class="flex-1 min-w-0">
+      {# Sort bar #}
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+        <p class="text-sm text-[#6b7280]">
+          Showing <strong class="text-[#1a1a2e]">{{ total_count|intcomma }}</strong> {{ make.name }} vehicle{{ total_count|pluralize }}
+        </p>
+        <form method="get">
+          <input type="hidden" name="make" value="{{ make.slug }}" />
+          <select name="sort" onchange="this.form.submit()"
+                  class="input-base text-sm py-2 w-auto pr-8">
+            {% for key, label in sort_options.items %}
+            <option value="{{ key }}" {% if sort_key == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+
+      {% if vehicles %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-px bg-[#e5e2db]">
+        {% for vehicle in vehicles %}
+        {% include "includes/vehicle_card.html" %}
+        {% endfor %}
+      </div>
+
+      {# Pagination #}
+      {% if paginator.num_pages > 1 %}
+      <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ page_obj.previous_page_number }}"
+           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">
+          Previous
+        </a>
+        {% endif %}
+        {% for num in paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-4 py-2 text-sm font-bold bg-[#1a1a2e] text-white border border-[#1a1a2e]">{{ num }}</span>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ num }}"
+           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ page_obj.next_page_number }}"
+           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">
+          Next
+        </a>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+      {% else %}
+      <div class="text-center py-20 border border-[#e5e2db] bg-white">
+        <div class="w-16 h-16 border border-[#e5e2db] flex items-center justify-center mx-auto mb-5">
+          <svg class="w-8 h-8 text-[#c8c0b8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#1a1a2e; margin-bottom:0.5rem;">No {{ make.name }} Vehicles Found</h3>
+        <p style="color:#6b7280; font-size:0.875rem; margin-bottom:1.5rem;">We are currently updating our {{ make.name }} inventory. Check back soon.</p>
+        <a href="{% url 'catalogue:vehicle_list' %}" class="btn-primary">Browse All Vehicles</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{# ── SEO text block ── #}
+<div class="bg-white border-t border-[#e5e2db]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="max-w-3xl">
+      <h2 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.5rem; color:#1a1a2e; margin-bottom:1rem;">
+        Buy {{ make.name }} Vehicles in Kenya — Grandpa Motors
+      </h2>
+      <p style="font-size:0.875rem; color:#6b7280; line-height:1.8;">
+        Grandpa Motors stocks a curated selection of {{ make.name }} vehicles for sale in Kenya, including both new and used options. Each {{ make.name }} listed on our platform has been assessed for documentation completeness, and our team discloses the logbook, duty, and transfer status before you inquire. Browse our current {{ make.name }} inventory above, filter by model and year, and contact us directly on WhatsApp to arrange a viewing.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

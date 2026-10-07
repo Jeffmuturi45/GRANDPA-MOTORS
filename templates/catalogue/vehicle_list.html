@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+     x-data="{ filterDrawerOpen: false }">
+
+  {# ── Mobile: search + filter/sort bar ── #}
+  <div class="lg:hidden mb-4 flex gap-2">
+    <form action="" method="get" class="flex-1 flex gap-2">
+      <input type="search" name="q" value="{{ params.q }}"
+             placeholder="Search vehicles..."
+             class="flex-1 form-input-base text-sm" />
+      <button type="submit" class="btn-primary py-2 px-3 text-sm">Search</button>
+    </form>
+    <button @click="filterDrawerOpen = true"
+            class="btn-secondary py-2 px-3 text-sm flex items-center gap-1">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+      </svg>
+      Filters
+      {% if active_filters %}
+      <span class="bg-brand-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">{{ active_filters|length }}</span>
+      {% endif %}
+    </button>
+  </div>
+
+  <div class="flex gap-6">
+
+    {# ── Desktop Sidebar Filters ── #}
+    <aside class="hidden lg:block w-64 flex-shrink-0">
+      {% include "includes/filter_sidebar.html" %}
+    </aside>
+
+    {# ── Mobile Filter Drawer ── #}
+    <div x-show="filterDrawerOpen" x-transition:enter="transition ease-out duration-200"
+         class="fixed inset-0 z-50 lg:hidden">
+      <div @click="filterDrawerOpen = false" class="absolute inset-0 bg-black/50"></div>
+      <div class="absolute right-0 top-0 h-full w-80 bg-white shadow-xl overflow-y-auto p-4">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="font-display font-bold text-lg">Filters</h2>
+          <button @click="filterDrawerOpen = false" class="p-2 rounded-lg hover:bg-slate-100">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        {% include "includes/filter_sidebar.html" %}
+      </div>
+    </div>
+
+    {# ── Main content ── #}
+    <div class="flex-1 min-w-0">
+
+      {# Results header #}
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
+        <div>
+          <h1 class="font-display font-bold text-xl text-slate-900">
+            {% if params.q %}Results for "{{ params.q }}"
+            {% else %}Browse Vehicles{% endif %}
+          </h1>
+          <p class="text-slate-500 text-sm">
+            {{ total_count|intcomma }} vehicle{{ total_count|pluralize }} found
+          </p>
+        </div>
+
+        {# Sort #}
+        <form method="get" class="flex items-center gap-2">
+          {% for key, value in params.items %}
+          {% if key != "sort" and key != "page" %}
+          <input type="hidden" name="{{ key }}" value="{{ value }}" />
+          {% endif %}
+          {% endfor %}
+          <select name="sort" onchange="this.form.submit()"
+                  class="form-input-base text-sm py-2 pr-8">
+            {% for key, label in sort_options.items %}
+            <option value="{{ key }}" {% if sort_key == key %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+
+      {# Active filter chips #}
+      {% if active_filters %}
+      <div class="flex flex-wrap gap-2 mb-4">
+        {% for f in active_filters %}
+        <span class="inline-flex items-center gap-1 px-3 py-1 bg-brand-50 text-brand-700 border border-brand-200 rounded-full text-xs font-medium">
+          {{ f.label }}
+          <a href="?{% for key, value in params.items %}{% if key != f.key and key != "page" %}{{ key }}={{ value }}&{% endif %}{% endfor %}"
+             class="hover:text-red-500 ml-1">×</a>
+        </span>
+        {% endfor %}
+        <a href="{% url 'catalogue:vehicle_list' %}"
+           class="px-3 py-1 bg-red-50 text-red-600 border border-red-200 rounded-full text-xs font-medium hover:bg-red-100">
+          Clear All
+        </a>
+      </div>
+      {% endif %}
+
+      {# Vehicle grid #}
+      {% if vehicles %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+        {% for vehicle in vehicles %}
+        {% include "includes/vehicle_card.html" %}
+        {% endfor %}
+      </div>
+
+      {# Pagination #}
+      {% if paginator.num_pages > 1 %}
+      <nav class="mt-8 flex items-center justify-center gap-1" aria-label="Pagination">
+        {% if page_obj.has_previous %}
+        <a href="?{% for key, value in params.items %}{% if key != "page" %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}"
+           class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg">← Prev</a>
+        {% endif %}
+
+        {% for num in paginator.page_range %}
+        {% if num == page_obj.number %}
+        <span class="px-3 py-2 text-sm font-bold bg-brand-600 text-white rounded-lg">{{ num }}</span>
+        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+        <a href="?{% for key, value in params.items %}{% if key != "page" %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}"
+           class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg">{{ num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?{% for key, value in params.items %}{% if key != "page" %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}"
+           class="px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 rounded-lg">Next →</a>
+        {% endif %}
+      </nav>
+      {% endif %}
+
+      {% else %}
+      {# Empty state #}
+      <div class="text-center py-16">
+        <div class="text-5xl mb-4">🔍</div>
+        <h3 class="font-display font-bold text-xl text-slate-700 mb-2">No vehicles found</h3>
+        <p class="text-slate-500 mb-6">Try adjusting your filters or search term.</p>
+        <a href="{% url 'catalogue:vehicle_list' %}" class="btn-primary">Clear All Filters</a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
