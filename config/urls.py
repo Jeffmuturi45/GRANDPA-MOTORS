@@ -28,9 +28,18 @@ handler404 = handler404
 handler500 = handler500
 handler403 = handler403
 
+import os
+from django.views.static import serve
+from django.urls import re_path
+
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [
         path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+elif not os.environ.get("AZURE_ACCOUNT_NAME"):
+    urlpatterns += [
+        re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    ]
+
