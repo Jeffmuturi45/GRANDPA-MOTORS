@@ -558,7 +558,7 @@
 
       {% for vehicle in latest_arrivals %}
 
-      {% include "includes/vehicle_card.html" %}
+      {% include "includes/vehicle_card.html" with lazy_load=True %}
 
       {% endfor %}
 
@@ -747,7 +747,7 @@
 
       {% for vehicle in price_reduced %}
 
-      {% include "includes/vehicle_card.html" %}
+      {% include "includes/vehicle_card.html" with lazy_load=True %}
 
       {% endfor %}
 

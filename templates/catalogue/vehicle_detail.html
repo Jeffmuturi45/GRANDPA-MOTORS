@@ -77,6 +77,7 @@
                                 alt="{{ vehicle.primary_image.alt_text|default:vehicle.title }}"
                                 class="w-full aspect-[4/3] object-cover"
                                 loading="eager"
+                                fetchpriority="high"
                             >
 
                         </div>
@@ -90,6 +91,7 @@
                                 alt="{{ vehicle.title }}"
                                 class="w-full aspect-[4/3] object-cover"
                                 loading="eager"
+                                fetchpriority="high"
                             >
 
                         </div>
@@ -140,6 +142,7 @@
                                         alt="{{ image.alt_text|default:vehicle.title }}"
                                         class="w-full aspect-square object-cover"
                                         loading="lazy"
+                                        decoding="async"
                                     >
 
                                 </div>
@@ -161,6 +164,7 @@
                                         alt="{{ vehicle.title }}"
                                         class="w-full aspect-square object-cover"
                                         loading="lazy"
+                                        decoding="async"
                                     >
 
                                 </div>
