@@ -184,7 +184,13 @@
         <div class="card-title">Recent Vehicles</div>
         <div class="card-subtitle">Latest additions to inventory</div>
       </div>
-      <a href="/admin/vehicles/vehicle/" target="_blank" class="card-action">View All</a>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <a href="/admin/vehicles/vehicle/add/" target="_blank" class="card-action" style="background:#c9a84c; color:#0b0f1a; padding:6px 14px; border-radius:8px; font-weight:700; text-transform:none; letter-spacing:normal; font-size:.78rem; text-decoration:none; display:inline-flex; align-items:center; gap:5px;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+          Add Vehicle
+        </a>
+        <a href="/admin/vehicles/vehicle/" target="_blank" class="card-action">View All</a>
+      </div>
     </div>
     <div style="overflow-x:auto;">
       <table class="data-table">
@@ -194,6 +200,7 @@
             <th>Status</th>
             <th>Condition</th>
             <th style="text-align:right;">Price (KES)</th>
+            <th style="text-align:center;">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -220,10 +227,14 @@
             <td class="vehicle-price">
               {% if v.price %}KSh {{ v.price|intcomma }}{% else %}—{% endif %}
             </td>
+            <td style="text-align:center; white-space:nowrap;">
+              <a href="/admin/vehicles/vehicle/{{ v.pk }}/change/" target="_blank" style="display:inline-block; padding:4px 8px; border-radius:6px; background:rgba(201,168,76,.12); color:#c9a84c; font-size:.7rem; font-weight:600; text-decoration:none; margin-right:4px;">Edit</a>
+              <a href="{{ v.get_absolute_url }}" target="_blank" style="display:inline-block; padding:4px 8px; border-radius:6px; background:#f1f5f9; color:#475569; font-size:.7rem; font-weight:500; text-decoration:none;">View</a>
+            </td>
           </tr>
           {% empty %}
-          <tr><td colspan="4" style="text-align:center;padding:32px;color:#94a3b8;font-size:.8rem;">
-            No vehicles yet. <a href="/admin/vehicles/vehicle/add/" style="color:#c9a84c;">Add your first vehicle →</a>
+          <tr><td colspan="5" style="text-align:center;padding:32px;color:#94a3b8;font-size:.8rem;">
+            No vehicles yet. <a href="/admin/vehicles/vehicle/add/" style="color:#c9a84c; font-weight:600;">Add your first vehicle →</a>
           </td></tr>
           {% endfor %}
         </tbody>

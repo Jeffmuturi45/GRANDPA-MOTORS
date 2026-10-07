@@ -91,16 +91,18 @@ def vehicle_list(request):
         )
         make_models_map[make.slug] = models_qs
 
-    # Transmission and Fuel choices
-    from vehicles.models import Transmission, FuelType
+    # Transmission, Fuel, and Condition choices
+    from vehicles.models import Transmission, FuelType, VehicleCondition
     transmission_choices = Transmission.choices
     fuel_type_choices    = FuelType.choices
+    condition_choices    = VehicleCondition.choices
 
-    # Active selections for make/model so sidebar can pre-check them
-    selected_makes  = params.getlist("make")
-    selected_models = params.getlist("model")
-    selected_trans  = params.getlist("transmission")
-    selected_fuels  = params.getlist("fuel_type")
+    # Active selections for make/model/condition/trans/fuel so sidebar can pre-check them
+    selected_makes      = params.getlist("make")
+    selected_models     = params.getlist("model")
+    selected_trans      = params.getlist("transmission")
+    selected_fuels      = params.getlist("fuel_type")
+    selected_conditions = params.getlist("condition")
 
     # Build active filters summary for display
     active_filters = _build_active_filters(params)
@@ -114,10 +116,12 @@ def vehicle_list(request):
         "make_models_map":    json.dumps(make_models_map),
         "transmission_choices": transmission_choices,
         "fuel_type_choices":  fuel_type_choices,
+        "condition_choices":  condition_choices,
         "selected_makes":     selected_makes,
         "selected_models":    selected_models,
         "selected_trans":     selected_trans,
         "selected_fuels":     selected_fuels,
+        "selected_conditions": selected_conditions,
         "sort_key":           sort_key,
         "sort_options":       SORT_LABELS,
         "active_filters":     active_filters,

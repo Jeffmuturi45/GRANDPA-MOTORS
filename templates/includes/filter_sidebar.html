@@ -225,41 +225,30 @@
         </svg>
       </button>
       <div x-show="open" x-transition class="space-y-1.5">
-        {% for name, label in doc_filter_list %}
-        <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 group">
-          <input type="checkbox" name="{{ name }}" value="1"
-                 {% if params|get_item:name %}checked{% endif %}
-                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c] focus:ring-offset-0"
-                 onchange="document.getElementById('filter-form').submit()" />
-          <span class="group-hover:font-medium transition-all">{{ label }}</span>
-        </label>
-        {% empty %}
-        {% for name, label in "docs_ready,Documents Ready|duty_paid,Duty Paid|transfer_ready,Transfer Ready|inspected,Inspected"|split:"|" %}{% endfor %}
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 group">
           <input type="checkbox" name="docs_ready" value="1" {% if params.docs_ready %}checked{% endif %}
-                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c]"
+                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c] focus:ring-offset-0"
                  onchange="document.getElementById('filter-form').submit()" />
-          <span>Documents Ready</span>
+          <span class="group-hover:font-medium transition-all">Documents Ready</span>
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 group">
           <input type="checkbox" name="duty_paid" value="1" {% if params.duty_paid %}checked{% endif %}
-                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c]"
+                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c] focus:ring-offset-0"
                  onchange="document.getElementById('filter-form').submit()" />
-          <span>Duty Paid</span>
+          <span class="group-hover:font-medium transition-all">Duty Paid</span>
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 group">
           <input type="checkbox" name="transfer_ready" value="1" {% if params.transfer_ready %}checked{% endif %}
-                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c]"
+                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c] focus:ring-offset-0"
                  onchange="document.getElementById('filter-form').submit()" />
-          <span>Transfer Ready</span>
+          <span class="group-hover:font-medium transition-all">Transfer Ready</span>
         </label>
         <label class="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-slate-900 group">
           <input type="checkbox" name="inspected" value="1" {% if params.inspected %}checked{% endif %}
-                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c]"
+                 class="rounded border-slate-300 text-[#c9a84c] focus:ring-[#c9a84c] focus:ring-offset-0"
                  onchange="document.getElementById('filter-form').submit()" />
-          <span>Inspected</span>
+          <span class="group-hover:font-medium transition-all">Inspected</span>
         </label>
-        {% endfor %}
       </div>
     </div>
 
