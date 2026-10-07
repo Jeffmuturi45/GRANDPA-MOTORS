@@ -1,159 +1,672 @@
 {% extends "base.html" %}
 {% load static humanize %}
 
-{% block title %}{{ make.name }} Vehicles for Sale in Kenya — Grandpa Motors{% endblock %}
-{% block extra_head %}
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "{{ make.name }} Vehicles at Grandpa Motors",
-  "description": "Browse {{ total_count }} {{ make.name }} vehicles available for sale in Kenya at Grandpa Motors.",
-  "url": "{{ request.build_absolute_uri }}"
-}
-</script>
+{% block title %}
+    {{ page_title }}
 {% endblock %}
+
+{% block extra_head %}
+
+    {# ── SEO Meta ── #}
+    <meta
+        name="description"
+        content="{{ meta_description }}"
+    >
+
+    <link
+        rel="canonical"
+        href="{{ request.build_absolute_uri }}"
+    >
+
+    {# ── Open Graph ── #}
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ page_title }}">
+    <meta property="og:description" content="{{ meta_description }}">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+
+    {% if category.image %}
+        <meta
+            property="og:image"
+            content="{{ request.scheme }}://{{ request.get_host }}{{ category.image.url }}"
+        >
+    {% endif %}
+
+    {# ── Twitter / Social ── #}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ page_title }}">
+    <meta name="twitter:description" content="{{ meta_description }}">
+
+    {% if category.image %}
+        <meta
+            name="twitter:image"
+            content="{{ request.scheme }}://{{ request.get_host }}{{ category.image.url }}"
+        >
+    {% endif %}
+
+    {# ── Breadcrumb Schema ── #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'catalogue:homepage' %}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Vehicles",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'catalogue:vehicle_list' %}"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "{{ category.name|escapejs }}",
+                "item": "{{ request.build_absolute_uri }}"
+            }
+        ]
+    }
+    </script>
+
+    {# ── ItemList Schema ── #}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "name": "{{ category.name|escapejs }} Vehicles for Sale in Kenya",
+        "description": "{{ meta_description|escapejs }}",
+        "numberOfItems": {{ total_count }},
+        "itemListOrder": "https://schema.org/ItemListOrderDescending",
+        "url": "{{ request.build_absolute_uri }}"
+    }
+    </script>
+
+{% endblock %}
+
 
 {% block content %}
 
-{# ── Page Header ── #}
-<div class="bg-[#1a1a2e] border-b border-white/10">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    {# Breadcrumb #}
-    <nav class="flex items-center gap-2 text-xs mb-5" aria-label="Breadcrumb">
-      <a href="{% url 'catalogue:homepage' %}" class="text-[#64748b] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors">Home</a>
-      <svg class="w-3 h-3 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <a href="{% url 'catalogue:vehicle_list' %}" class="text-[#64748b] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors">Vehicles</a>
-      <svg class="w-3 h-3 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      <span class="text-[#c9a84c] font-semibold uppercase tracking-wide">{{ make.name }}</span>
-    </nav>
+{# ========================================================================== #}
+{# CATEGORY HERO                                                              #}
+{# ========================================================================== #}
 
-    <div class="flex items-end justify-between">
-      <div>
-        <span class="section-label text-[#c9a84c]">Make</span>
-        <h1 style="font-family:'Playfair Display',serif; font-weight:800; font-size:clamp(2rem,5vw,3rem); color:#ffffff; line-height:1.1;">
-          {{ make.name }} Vehicles
-        </h1>
-        <p style="color:#94a3b8; font-size:0.9rem; margin-top:0.5rem;">
-          {{ total_count|intcomma }} vehicle{{ total_count|pluralize }} available in Kenya
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
+<section class="bg-[#1a1a2e] border-b border-white/10">
 
-{# ── Models quick-filter bar ── #}
-{% if make_models %}
-<div class="bg-white border-b border-[#e5e2db] sticky top-16 z-20">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center gap-0 overflow-x-auto no-scrollbar">
-      <a href="{% url 'catalogue:by_make' make.slug %}"
-         class="flex-shrink-0 px-5 py-3.5 text-xs font-bold uppercase tracking-widest border-b-2 transition-colors
-                border-[#c9a84c] text-[#1a1a2e]">
-        All Models
-      </a>
-      {% for m in make_models %}
-      <a href="{% url 'catalogue:vehicle_list' %}?make={{ make.slug }}&model={{ m.slug }}"
-         class="flex-shrink-0 px-5 py-3.5 text-xs font-semibold uppercase tracking-widest border-b-2 transition-colors whitespace-nowrap
-                border-transparent text-[#6b7280] hover:text-[#1a1a2e] hover:border-[#e5e2db]">
-        {{ m.name }}
-        {% if m.vehicle_count %}
-        <span style="font-size:0.6rem;" class="text-[#9ca3af] ml-1">({{ m.vehicle_count }})</span>
-        {% endif %}
-      </a>
-      {% endfor %}
-    </div>
-  </div>
-</div>
-{% endif %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
 
-{# ── Content ── #}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="flex gap-6">
+        {# Breadcrumb #}
+        <nav
+            class="flex items-center gap-2 text-xs mb-7"
+            aria-label="Breadcrumb"
+        >
 
-    {# Filter sidebar #}
-    <aside class="hidden lg:block w-64 flex-shrink-0">
-      {% include "includes/filter_sidebar.html" %}
-    </aside>
+            <a
+                href="{% url 'catalogue:homepage' %}"
+                class="text-[#94a3b8] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors"
+            >
+                Home
+            </a>
 
-    <div class="flex-1 min-w-0">
-      {# Sort bar #}
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
-        <p class="text-sm text-[#6b7280]">
-          Showing <strong class="text-[#1a1a2e]">{{ total_count|intcomma }}</strong> {{ make.name }} vehicle{{ total_count|pluralize }}
-        </p>
-        <form method="get">
-          <input type="hidden" name="make" value="{{ make.slug }}" />
-          <select name="sort" onchange="this.form.submit()"
-                  class="input-base text-sm py-2 w-auto pr-8">
-            {% for key, label in sort_options.items %}
-            <option value="{{ key }}" {% if sort_key == key %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </form>
-      </div>
+            <svg
+                class="w-3 h-3 text-[#475569]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                />
+            </svg>
 
-      {% if vehicles %}
-      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-px bg-[#e5e2db]">
-        {% for vehicle in vehicles %}
-        {% include "includes/vehicle_card.html" %}
-        {% endfor %}
-      </div>
+            <a
+                href="{% url 'catalogue:vehicle_list' %}"
+                class="text-[#94a3b8] hover:text-[#c9a84c] font-medium uppercase tracking-wide transition-colors"
+            >
+                Vehicles
+            </a>
 
-      {# Pagination #}
-      {% if paginator.num_pages > 1 %}
-      <nav class="mt-10 flex items-center justify-center gap-1" aria-label="Pagination">
-        {% if page_obj.has_previous %}
-        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ page_obj.previous_page_number }}"
-           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">
-          Previous
-        </a>
-        {% endif %}
-        {% for num in paginator.page_range %}
-        {% if num == page_obj.number %}
-        <span class="px-4 py-2 text-sm font-bold bg-[#1a1a2e] text-white border border-[#1a1a2e]">{{ num }}</span>
-        {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ num }}"
-           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">{{ num }}</a>
-        {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-        <a href="?make={{ make.slug }}&sort={{ sort_key }}&page={{ page_obj.next_page_number }}"
-           class="px-4 py-2 text-sm font-medium border border-[#e5e2db] hover:border-[#1a1a2e] text-[#374151] transition-colors">
-          Next
-        </a>
-        {% endif %}
-      </nav>
-      {% endif %}
+            <svg
+                class="w-3 h-3 text-[#475569]"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                />
+            </svg>
 
-      {% else %}
-      <div class="text-center py-20 border border-[#e5e2db] bg-white">
-        <div class="w-16 h-16 border border-[#e5e2db] flex items-center justify-center mx-auto mb-5">
-          <svg class="w-8 h-8 text-[#c8c0b8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
+            <span class="text-[#c9a84c] font-semibold uppercase tracking-wide">
+                {{ category.name }}
+            </span>
+
+        </nav>
+
+
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 items-center">
+
+            {# Hero text #}
+            <div>
+
+                <span class="section-label text-[#c9a84c]">
+                    Vehicle Category
+                </span>
+
+                <h1
+                    class="mt-2 text-white"
+                    style="
+                        font-family:'Playfair Display',serif;
+                        font-weight:800;
+                        font-size:clamp(2.25rem,5vw,4rem);
+                        line-height:1.05;
+                    "
+                >
+                    {{ category.name }} Vehicles
+                </h1>
+
+                <p
+                    class="mt-4 max-w-2xl"
+                    style="
+                        color:#94a3b8;
+                        font-size:1rem;
+                        line-height:1.7;
+                    "
+                >
+                    {% if category.description %}
+                        {{ category.description }}
+                    {% else %}
+                        Browse our selection of {{ category.name|lower }}
+                        vehicles available for sale in Kenya at Grandpa Motors.
+                    {% endif %}
+                </p>
+
+                <div class="flex flex-wrap items-center gap-3 mt-6">
+
+                    <div
+                        class="inline-flex items-center gap-2 px-4 py-2
+                               border border-white/10 bg-white/5"
+                    >
+                        <span class="w-2 h-2 rounded-full bg-[#c9a84c]"></span>
+
+                        <span class="text-white font-semibold text-sm">
+                            {{ total_count|intcomma }}
+                        </span>
+
+                        <span class="text-[#94a3b8] text-sm">
+                            vehicle{{ total_count|pluralize }} available
+                        </span>
+                    </div>
+
+                    {% if category.is_popular %}
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-2
+                                   border border-[#c9a84c]/30
+                                   bg-[#c9a84c]/10
+                                   text-[#c9a84c] text-xs
+                                   font-bold uppercase tracking-wider"
+                        >
+                            <svg
+                                class="w-4 h-4"
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
+                                aria-hidden="true"
+                            >
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.802 2.036a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.538 1.118l-2.802-2.036a1 1 0 00-1.176 0l-2.802 2.036c-.783.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.363-1.118L2.913 8.719c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.136-3.292z"/>
+                            </svg>
+                            Popular Category
+                        </div>
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            {# Category image #}
+            {% if category.image %}
+
+                <div class="hidden lg:block">
+
+                    <div
+                        class="relative aspect-[4/3] overflow-hidden
+                               border border-white/10 bg-[#111827]"
+                    >
+
+                        <img
+                            src="{{ category.image.url }}"
+                            alt="{{ category.name }} vehicles for sale in Kenya"
+                            class="w-full h-full object-cover"
+                            loading="eager"
+                            decoding="async"
+                        >
+
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t
+                                   from-[#1a1a2e]/70 via-transparent to-transparent"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            {% elif category.icon %}
+
+                <div class="hidden lg:flex justify-end">
+
+                    <div
+                        class="w-40 h-40
+                               border border-[#c9a84c]/20
+                               bg-[#c9a84c]/5
+                               flex items-center justify-center"
+                    >
+
+                        <span
+                            class="text-7xl"
+                            aria-hidden="true"
+                        >
+                            {{ category.icon }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
         </div>
-        <h3 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.25rem; color:#1a1a2e; margin-bottom:0.5rem;">No {{ make.name }} Vehicles Found</h3>
-        <p style="color:#6b7280; font-size:0.875rem; margin-bottom:1.5rem;">We are currently updating our {{ make.name }} inventory. Check back soon.</p>
-        <a href="{% url 'catalogue:vehicle_list' %}" class="btn-primary">Browse All Vehicles</a>
-      </div>
-      {% endif %}
+
     </div>
-  </div>
+
+</section>
+
+
+{# ========================================================================== #}
+{# MAIN CONTENT                                                               #}
+{# ========================================================================== #}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+
+    <div class="flex gap-6">
+
+
+        {# ================================================================== #}
+        {# FILTER SIDEBAR                                                     #}
+        {# ================================================================== #}
+
+        <aside class="hidden lg:block w-64 flex-shrink-0">
+
+            {% include "includes/filter_sidebar.html" %}
+
+        </aside>
+
+
+        {# ================================================================== #}
+        {# VEHICLE RESULTS                                                    #}
+        {# ================================================================== #}
+
+        <main class="flex-1 min-w-0">
+
+
+            {# -------------------------------------------------------------- #}
+            {# Results / Sort Bar                                             #}
+            {# -------------------------------------------------------------- #}
+
+            <div
+                class="flex flex-col sm:flex-row
+                       sm:items-center sm:justify-between
+                       gap-4 mb-6"
+            >
+
+                <div>
+
+                    <p class="text-sm text-[#6b7280]">
+
+                        Showing
+
+                        <strong class="text-[#1a1a2e]">
+                            {{ total_count|intcomma }}
+                        </strong>
+
+                        {{ category.name|lower }}
+                        vehicle{{ total_count|pluralize }}
+
+                    </p>
+
+                </div>
+
+
+                <form method="get">
+
+                    {# Keep category locked when sorting #}
+                    <input
+                        type="hidden"
+                        name="category"
+                        value="{{ category.slug }}"
+                    >
+
+                    <label
+                        for="category-sort"
+                        class="sr-only"
+                    >
+                        Sort vehicles
+                    </label>
+
+                    <select
+                        id="category-sort"
+                        name="sort"
+                        onchange="this.form.submit()"
+                        class="input-base text-sm py-2 w-auto pr-8"
+                    >
+
+                        {% for key, label in sort_options.items %}
+
+                            <option
+                                value="{{ key }}"
+                                {% if sort_key == key %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </form>
+
+            </div>
+
+
+            {# -------------------------------------------------------------- #}
+            {# Vehicle Grid                                                     #}
+            {# -------------------------------------------------------------- #}
+
+            {% if vehicles %}
+
+                <div
+                    class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3
+                           gap-px bg-[#e5e2db]"
+                >
+
+                    {% for vehicle in vehicles %}
+
+                        {% include "includes/vehicle_card.html" %}
+
+                    {% endfor %}
+
+                </div>
+
+
+                {# ---------------------------------------------------------- #}
+                {# Pagination                                                   #}
+                {# ---------------------------------------------------------- #}
+
+                {% if paginator.num_pages > 1 %}
+
+                    <nav
+                        class="mt-10 flex items-center justify-center gap-1
+                               flex-wrap"
+                        aria-label="Pagination"
+                    >
+
+                        {% if page_obj.has_previous %}
+
+                            <a
+                                href="?category={{ category.slug }}&sort={{ sort_key }}&page={{ page_obj.previous_page_number }}"
+                                class="px-4 py-2 text-sm font-medium
+                                       border border-[#e5e2db]
+                                       hover:border-[#1a1a2e]
+                                       text-[#374151]
+                                       transition-colors"
+                                aria-label="Previous page"
+                            >
+                                Previous
+                            </a>
+
+                        {% endif %}
+
+
+                        {% for num in paginator.page_range %}
+
+                            {% if num == page_obj.number %}
+
+                                <span
+                                    class="px-4 py-2 text-sm font-bold
+                                           bg-[#1a1a2e] text-white
+                                           border border-[#1a1a2e]"
+                                    aria-current="page"
+                                >
+                                    {{ num }}
+                                </span>
+
+                            {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+
+                                <a
+                                    href="?category={{ category.slug }}&sort={{ sort_key }}&page={{ num }}"
+                                    class="px-4 py-2 text-sm font-medium
+                                           border border-[#e5e2db]
+                                           hover:border-[#1a1a2e]
+                                           text-[#374151]
+                                           transition-colors"
+                                >
+                                    {{ num }}
+                                </a>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+
+                        {% if page_obj.has_next %}
+
+                            <a
+                                href="?category={{ category.slug }}&sort={{ sort_key }}&page={{ page_obj.next_page_number }}"
+                                class="px-4 py-2 text-sm font-medium
+                                       border border-[#e5e2db]
+                                       hover:border-[#1a1a2e]
+                                       text-[#374151]
+                                       transition-colors"
+                                aria-label="Next page"
+                            >
+                                Next
+                            </a>
+
+                        {% endif %}
+
+                    </nav>
+
+                {% endif %}
+
+
+            {% else %}
+
+                {# ---------------------------------------------------------- #}
+                {# Empty State                                                   #}
+                {# ---------------------------------------------------------- #}
+
+                <div
+                    class="text-center py-20
+                           border border-[#e5e2db]
+                           bg-white"
+                >
+
+                    <div
+                        class="w-16 h-16
+                               border border-[#e5e2db]
+                               flex items-center justify-center
+                               mx-auto mb-5"
+                    >
+
+                        <svg
+                            class="w-8 h-8 text-[#c8c0b8]"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="1.5"
+                                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                            />
+                        </svg>
+
+                    </div>
+
+
+                    <h2
+                        style="
+                            font-family:'Playfair Display',serif;
+                            font-weight:700;
+                            font-size:1.5rem;
+                            color:#1a1a2e;
+                            margin-bottom:0.5rem;
+                        "
+                    >
+                        No {{ category.name }} Vehicles Found
+                    </h2>
+
+
+                    <p
+                        class="max-w-md mx-auto"
+                        style="
+                            color:#6b7280;
+                            font-size:0.875rem;
+                            line-height:1.7;
+                            margin-bottom:1.5rem;
+                        "
+                    >
+                        We are currently updating our
+                        {{ category.name|lower }} inventory.
+                        Check back soon or browse our complete vehicle collection.
+                    </p>
+
+
+                    <a
+                        href="{% url 'catalogue:vehicle_list' %}"
+                        class="btn-primary"
+                    >
+                        Browse All Vehicles
+                    </a>
+
+                </div>
+
+            {% endif %}
+
+        </main>
+
+    </div>
+
 </div>
 
-{# ── SEO text block ── #}
-<div class="bg-white border-t border-[#e5e2db]">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="max-w-3xl">
-      <h2 style="font-family:'Playfair Display',serif; font-weight:700; font-size:1.5rem; color:#1a1a2e; margin-bottom:1rem;">
-        Buy {{ make.name }} Vehicles in Kenya — Grandpa Motors
-      </h2>
-      <p style="font-size:0.875rem; color:#6b7280; line-height:1.8;">
-        Grandpa Motors stocks a curated selection of {{ make.name }} vehicles for sale in Kenya, including both new and used options. Each {{ make.name }} listed on our platform has been assessed for documentation completeness, and our team discloses the logbook, duty, and transfer status before you inquire. Browse our current {{ make.name }} inventory above, filter by model and year, and contact us directly on WhatsApp to arrange a viewing.
-      </p>
+
+{# ========================================================================== #}
+{# CATEGORY SEO CONTENT                                                      #}
+{# ========================================================================== #}
+
+<section class="bg-white border-t border-[#e5e2db]">
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+
+        <div class="max-w-4xl">
+
+            <span class="section-label text-[#c9a84c]">
+                Grandpa Motors
+            </span>
+
+            <h2
+                class="mt-2"
+                style="
+                    font-family:'Playfair Display',serif;
+                    font-weight:700;
+                    font-size:clamp(1.5rem,3vw,2rem);
+                    color:#1a1a2e;
+                    line-height:1.2;
+                "
+            >
+                {{ category.name }} Vehicles for Sale in Kenya
+            </h2>
+
+
+            <div
+                class="mt-5 space-y-4"
+                style="
+                    font-size:0.9rem;
+                    color:#6b7280;
+                    line-height:1.9;
+                "
+            >
+
+                {% if category.description %}
+
+                    <p>
+                        {{ category.description }}
+                    </p>
+
+                {% endif %}
+
+                <p>
+                    Explore our current selection of
+                    {{ category.name|lower }} vehicles available
+                    through Grandpa Motors in Kenya.
+                    Our inventory is updated as vehicles become available,
+                    giving you access to current stock and detailed vehicle
+                    information.
+                </p>
+
+                <p>
+                    Each vehicle listing provides important information such as
+                    pricing, specifications, condition, mileage, documentation
+                    status and availability where applicable.
+                    When you find a vehicle that interests you, you can contact
+                    Grandpa Motors directly to discuss the vehicle and arrange
+                    the next steps.
+                </p>
+
+            </div>
+
+
+            <div class="mt-7 flex flex-wrap gap-3">
+
+                <a
+                    href="{% url 'catalogue:vehicle_list' %}"
+                    class="btn-primary"
+                >
+                    Browse All Vehicles
+                </a>
+
+                <a
+                    href="{% url 'catalogue:homepage' %}"
+                    class="inline-flex items-center justify-center
+                           px-5 py-2.5
+                           border border-[#1a1a2e]
+                           text-[#1a1a2e]
+                           text-sm font-semibold
+                           hover:bg-[#1a1a2e]
+                           hover:text-white
+                           transition-colors"
+                >
+                    Back to Home
+                </a>
+
+            </div>
+
+        </div>
+
     </div>
-  </div>
-</div>
+
+</section>
+
 
 {% endblock %}

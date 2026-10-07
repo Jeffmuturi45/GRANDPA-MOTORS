@@ -1,0 +1,309 @@
+{% extends "administration/base_admin.html" %}
+{% load humanize %}
+
+{% block title %}Analytics — Grandpa Motors Admin{% endblock %}
+{% block page_heading %}Analytics{% endblock %}
+{% block page_subheading %}Traffic, engagement & inventory performance{% endblock %}
+
+{% block dashboard_content %}
+
+{# ═══ Snapshot KPIs ═══ #}
+<div class="traffic-grid" style="margin-bottom:22px;">
+
+  <div class="traffic-card" style="--card-bg-from:#0b0f1a; --card-bg-to:#131929; --traffic-orb:rgba(201,168,76,.1);">
+    <div class="traffic-label">Today</div>
+    <div class="traffic-value">{{ snapshot.today|default:0|intcomma }}</div>
+    <div class="traffic-sub">Page views</div>
+    <div><span class="traffic-change flat">{{ snapshot.today_sessions|default:0|intcomma }} sessions</span></div>
+  </div>
+
+  <div class="traffic-card" style="--card-bg-from:#0d1117; --card-bg-to:#161d2a; --traffic-orb:rgba(16,185,129,.08);">
+    <div class="traffic-label">Last 7 Days</div>
+    <div class="traffic-value">{{ snapshot.week|default:0|intcomma }}</div>
+    <div class="traffic-sub">Page views</div>
+    {% if snapshot.week_change is not None %}
+    <div>
+      <span class="traffic-change {% if snapshot.week_change >= 0 %}up{% else %}down{% endif %}">
+        {% if snapshot.week_change >= 0 %}↑{% else %}↓{% endif %} {{ snapshot.week_change|floatformat:1 }}%
+      </span>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="traffic-card" style="--card-bg-from:#0d1117; --card-bg-to:#16202e; --traffic-orb:rgba(59,130,246,.08);">
+    <div class="traffic-label">Last 30 Days</div>
+    <div class="traffic-value">{{ snapshot.month|default:0|intcomma }}</div>
+    <div class="traffic-sub">Page views</div>
+    {% if snapshot.month_change is not None %}
+    <div>
+      <span class="traffic-change {% if snapshot.month_change >= 0 %}up{% else %}down{% endif %}">
+        {% if snapshot.month_change >= 0 %}↑{% else %}↓{% endif %} {{ snapshot.month_change|floatformat:1 }}%
+      </span>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="traffic-card" style="--card-bg-from:#0b0f1a; --card-bg-to:#1a1230; --traffic-orb:rgba(139,92,246,.08);">
+    <div class="traffic-label">All Time</div>
+    <div class="traffic-value">{{ snapshot.all_time|default:0|intcomma }}</div>
+    <div class="traffic-sub">Total page views</div>
+    <div><span class="traffic-change flat">{{ snapshot.all_sessions|default:0|intcomma }} sessions</span></div>
+  </div>
+
+</div>
+
+{# ═══ Chart Row ═══ #}
+<div style="display:grid; grid-template-columns:1fr 280px; gap:18px; margin-bottom:18px;"
+     x-data="analyticsCharts()">
+
+  {# Line chart #}
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Traffic Trend</div>
+        <div class="card-subtitle">Daily page views and unique sessions</div>
+      </div>
+      <div class="chart-tabs">
+        <button class="chart-tab" :class="period===7?'active':''"  @click="switchPeriod(7)">7D</button>
+        <button class="chart-tab" :class="period===30?'active':''" @click="switchPeriod(30)">30D</button>
+        <button class="chart-tab" :class="period===90?'active':''" @click="switchPeriod(90)">90D</button>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:280px;position:relative;">
+      <canvas id="trendChart"></canvas>
+    </div>
+  </div>
+
+  {# Doughnut — device breakdown #}
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Device Breakdown</div>
+        <div class="card-subtitle">Last 30 days</div>
+      </div>
+    </div>
+    <div class="device-wrap">
+      <div class="device-chart-area">
+        <canvas id="deviceChart"></canvas>
+      </div>
+      <div class="device-legend">
+        {% with total=device_data %}
+        <div class="device-legend-row">
+          <div class="device-legend-left">
+            <div class="device-dot" style="background:#3b82f6;"></div>
+            <span class="device-label">Desktop</span>
+          </div>
+          <span class="device-pct" id="desktop-pct">—</span>
+        </div>
+        <div class="device-legend-row">
+          <div class="device-legend-left">
+            <div class="device-dot" style="background:#c9a84c;"></div>
+            <span class="device-label">Mobile</span>
+          </div>
+          <span class="device-pct" id="mobile-pct">—</span>
+        </div>
+        <div class="device-legend-row">
+          <div class="device-legend-left">
+            <div class="device-dot" style="background:#8b5cf6;"></div>
+            <span class="device-label">Tablet</span>
+          </div>
+          <span class="device-pct" id="tablet-pct">—</span>
+        </div>
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{# ═══ Bottom Row: Top Vehicles + Top Pages ═══ #}
+<div class="bottom-grid">
+
+  {# Top Vehicles Table #}
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Top Performing Vehicles</div>
+        <div class="card-subtitle">Last 30 days by page views</div>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:36px;">#</th>
+            <th>Vehicle</th>
+            <th style="text-align:right;">Views</th>
+            <th style="text-align:right;">Inquiries</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in top_vehicles %}
+          <tr>
+            <td>
+              <div class="tv-rank {% if forloop.counter == 1 %}gold{% elif forloop.counter == 2 %}silver{% elif forloop.counter == 3 %}bronze{% endif %}" style="display:inline-flex;margin:0;">
+                {{ forloop.counter }}
+              </div>
+            </td>
+            <td>
+              <div class="vehicle-name">
+                {{ v.vehicle__year }} {{ v.vehicle__make__name }} {{ v.vehicle__model__name }}
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <span style="font-family:'DM Mono',monospace;font-size:.78rem;font-weight:700;color:#0f172a;">{{ v.total_views|default:0|intcomma }}</span>
+            </td>
+            <td style="text-align:right;">
+              <span style="font-family:'DM Mono',monospace;font-size:.78rem;color:#64748b;">{{ v.total_inquiries|default:0 }}</span>
+            </td>
+            <td>
+              {% if v.vehicle__status == "AVAILABLE" %}<span class="badge badge-available">Available</span>
+              {% elif v.vehicle__status == "SOLD" %}<span class="badge badge-sold">Sold</span>
+              {% elif v.vehicle__status == "RESERVED" %}<span class="badge badge-reserved">Reserved</span>
+              {% else %}<span class="badge badge-archived">{{ v.vehicle__status }}</span>{% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align:center;padding:32px;color:#94a3b8;font-size:.8rem;">
+            No vehicle view data yet. Run <code>python manage.py seed_demo_data</code> to populate.
+          </td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {# Top Pages #}
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <div class="card-title">Top Pages</div>
+        <div class="card-subtitle">Last 30 days by visits</div>
+      </div>
+    </div>
+    <div style="padding:8px 0;">
+      {% for page in top_pages %}
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 20px;border-bottom:1px solid #f8fafc;transition:background .15s;"
+           onmouseenter="this.style.background='#f8fafc'" onmouseleave="this.style.background=''">
+        <div style="min-width:0;flex:1;">
+          <div style="font-size:.75rem;font-weight:600;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ page.path }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:12px;">
+          <div style="width:80px;height:5px;border-radius:3px;background:#f0f2f8;overflow:hidden;">
+            {% with max_count=top_pages.0.count %}
+            <div style="height:100%;border-radius:3px;background:linear-gradient(90deg,#c9a84c,#a07828);width:{% if max_count %}{% widthratio page.count max_count 100 %}{% else %}0{% endif %}%;"></div>
+            {% endwith %}
+          </div>
+          <span style="font-family:'DM Mono',monospace;font-size:.72rem;font-weight:700;color:#0f172a;min-width:36px;text-align:right;">{{ page.count|intcomma }}</span>
+        </div>
+      </div>
+      {% empty %}
+      <div style="padding:32px;text-align:center;color:#94a3b8;font-size:.8rem;">No page data yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+const DEVICE_DATA = {{ device_data|safe }};
+const CHART_LABELS   = {{ chart_labels|safe }};
+const CHART_VIEWS    = {{ chart_views|safe }};
+const CHART_SESSIONS = {{ chart_sessions|safe }};
+
+function analyticsCharts() {
+  return {
+    period: 30,
+    trendChart: null,
+    deviceChart: null,
+
+    init() {
+      this.$nextTick(() => {
+        this.renderTrend(CHART_LABELS, CHART_VIEWS, CHART_SESSIONS);
+        this.renderDevice(DEVICE_DATA);
+      });
+    },
+
+    renderTrend(labels, views, sessions) {
+      const ctx = document.getElementById('trendChart');
+      if (!ctx) return;
+      if (this.trendChart) this.trendChart.destroy();
+
+      const g1 = ctx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+      g1.addColorStop(0, 'rgba(201,168,76,0.3)');
+      g1.addColorStop(1, 'rgba(201,168,76,0)');
+      const g2 = ctx.getContext('2d').createLinearGradient(0, 0, 0, 280);
+      g2.addColorStop(0, 'rgba(59,130,246,0.2)');
+      g2.addColorStop(1, 'rgba(59,130,246,0)');
+
+      this.trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            { label:'Page Views',      data:views,    borderColor:'#c9a84c', backgroundColor:g1, borderWidth:2.5, tension:0.4, fill:true, pointRadius:labels.length>30?0:3, pointHoverRadius:5, pointBackgroundColor:'#c9a84c' },
+            { label:'Unique Sessions', data:sessions, borderColor:'#3b82f6', backgroundColor:g2, borderWidth:2,   tension:0.4, fill:true, pointRadius:labels.length>30?0:3, pointHoverRadius:5, pointBackgroundColor:'#3b82f6' },
+          ],
+        },
+        options: {
+          responsive:true, maintainAspectRatio:false,
+          interaction: { mode:'index', intersect:false },
+          plugins: {
+            legend: { display:true, position:'top', align:'end', labels:{ boxWidth:10,boxHeight:2,borderRadius:2, font:{size:11,family:'Plus Jakarta Sans'}, color:'#64748b', padding:16, usePointStyle:true, pointStyle:'line' } },
+            tooltip: { backgroundColor:'#0f172a', titleColor:'#e2e8f0', bodyColor:'#94a3b8', borderColor:'rgba(255,255,255,.08)', borderWidth:1, padding:12, cornerRadius:10 },
+          },
+          scales: {
+            x: { grid:{display:false}, ticks:{color:'#94a3b8', font:{size:10,family:'Plus Jakarta Sans'}, maxTicksLimit:8}, border:{display:false} },
+            y: { grid:{color:'rgba(0,0,0,.05)'}, ticks:{color:'#94a3b8', font:{size:10,family:'Plus Jakarta Sans'}, maxTicksLimit:5, callback:v=>v>=1000?(v/1000).toFixed(1)+'k':v}, border:{display:false,dash:[4,4]} },
+          },
+        },
+      });
+    },
+
+    renderDevice(data) {
+      const ctx = document.getElementById('deviceChart');
+      if (!ctx) return;
+      const total = (data.desktop||0) + (data.mobile||0) + (data.tablet||0) || 1;
+      const pct = v => Math.round(v/total*100) + '%';
+
+      document.getElementById('desktop-pct').textContent = pct(data.desktop||0);
+      document.getElementById('mobile-pct').textContent  = pct(data.mobile||0);
+      document.getElementById('tablet-pct').textContent  = pct(data.tablet||0);
+
+      if (this.deviceChart) this.deviceChart.destroy();
+      this.deviceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Desktop', 'Mobile', 'Tablet'],
+          datasets: [{
+            data: [data.desktop||0, data.mobile||0, data.tablet||0],
+            backgroundColor: ['#3b82f6','#c9a84c','#8b5cf6'],
+            borderWidth: 0,
+            hoverOffset: 4,
+          }],
+        },
+        options: {
+          responsive:true, maintainAspectRatio:true,
+          cutout: '72%',
+          plugins: {
+            legend: { display:false },
+            tooltip: { backgroundColor:'#0f172a', bodyColor:'#e2e8f0', padding:10, cornerRadius:8 },
+          },
+        },
+      });
+    },
+
+    switchPeriod(days) {
+      this.period = days;
+      fetch(`{% url 'administration:chart_api' %}?days=${days}`)
+        .then(r => r.json())
+        .then(d => this.renderTrend(d.labels, d.views, d.sessions));
+    },
+  };
+}
+</script>
+{% endblock %}
