@@ -447,10 +447,67 @@ class Vehicle(models.Model):
         """Return the primary image object, or None."""
         return self.images.filter(is_primary=True).first() or self.images.first()
 
+    DEFAULT_MAKE_IMAGES = {
+        "Toyota": "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?auto=format&fit=crop&w=1200&q=80",
+        "Mercedes": "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=1200&q=80",
+        "BMW": "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80",
+        "Subaru": "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1200&q=80",
+        "Nissan": "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=1200&q=80",
+        "Mitsubishi": "https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1200&q=80",
+        "Isuzu": "https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=1200&q=80",
+        "Volkswagen": "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80",
+        "Honda": "https://images.unsplash.com/photo-1617469767053-d3b523a0b982?auto=format&fit=crop&w=1200&q=80",
+        "Ford": "https://images.unsplash.com/photo-1551830820-330a71b99659?auto=format&fit=crop&w=1200&q=80",
+        "Mazda": "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80",
+        "Hyundai": "https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=1200&q=80",
+    }
+
+    DEFAULT_CATEGORY_IMAGES = {
+        "SUV": "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80",
+        "Sedan": "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80",
+        "Pickup / Truck": "https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=1200&q=80",
+        "Hatchback": "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=1200&q=80",
+        "Van / Minivan": "https://images.unsplash.com/photo-1570737543098-0983d88f796d?auto=format&fit=crop&w=1200&q=80",
+        "Station Wagon": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80",
+        "Commercial": "https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80",
+    }
+
     @property
-    def primary_image_url(self) -> str | None:
+    def get_default_image_url(self) -> str:
+        """Returns a high-quality realistic vehicle photo based on make or category."""
+        if self.make_id and self.make.name in self.DEFAULT_MAKE_IMAGES:
+            return self.DEFAULT_MAKE_IMAGES[self.make.name]
+        if self.category_id and self.category.name in self.DEFAULT_CATEGORY_IMAGES:
+            return self.DEFAULT_CATEGORY_IMAGES[self.category.name]
+        return "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1200&q=80"
+
+    @property
+    def primary_image_url(self) -> str:
         img = self.primary_image
-        return img.image.url if img else None
+        if img and img.image:
+            try:
+                return img.image.url
+            except Exception:
+                pass
+        return self.get_default_image_url
+
+    @property
+    def display_gallery_urls(self) -> list[str]:
+        """Returns uploaded image URLs or a set of multi-angle photos for the detail gallery."""
+        urls = []
+        for img in self.images.all():
+            if img.image:
+                try:
+                    urls.append(img.image.url)
+                except Exception:
+                    pass
+        if urls:
+            return urls
+        base = self.get_default_image_url
+        interior = "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=1200&q=80"
+        cockpit = "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80"
+        return [base, interior, cockpit]
+
 
     @property
     def is_price_reduced(self) -> bool:

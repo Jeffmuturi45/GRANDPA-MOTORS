@@ -4,12 +4,24 @@
 
     {# ── Image ── #}
     <div class="card-image relative overflow-hidden bg-[#f1ede6]" style="aspect-ratio:16/10;">
-      {% with img=vehicle.primary_images_list.0|default:None %}
-      {% if img %}
+      {% with img=vehicle.primary_images_list.0|default:vehicle.primary_image %}
+      {% if img and img.image %}
       <img
         src="{{ img.image.url }}"
         alt="{{ img.alt_text|default:vehicle.title }}"
-        class="w-full h-full object-cover transition-transform duration-500"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+        {% if forloop.first and forloop.parentloop.first %}
+          loading="eager" fetchpriority="high"
+        {% else %}
+          loading="lazy"
+        {% endif %}
+        width="400" height="250"
+      />
+      {% elif vehicle.primary_image_url %}
+      <img
+        src="{{ vehicle.primary_image_url }}"
+        alt="{{ vehicle.title }}"
+        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         {% if forloop.first and forloop.parentloop.first %}
           loading="eager" fetchpriority="high"
         {% else %}
@@ -58,11 +70,7 @@
 
       {# Condition + Year #}
       <div class="flex items-center gap-2 mb-2">
-        <span style="font-size:0.65rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
-          {% if vehicle.condition == 'NEW' %}color:#059669;
-          {% elif vehicle.condition == 'FOREIGN_USED' %}color:#2563eb;
-          {% elif vehicle.condition == 'LOCALLY_USED' %}color:#d97706;
-          {% else %}color:#7c3aed;{% endif %}">
+        <span class="text-[10px] font-bold tracking-wider uppercase {% if vehicle.condition == 'NEW' %}text-emerald-600{% elif vehicle.condition == 'FOREIGN_USED' %}text-blue-600{% elif vehicle.condition == 'LOCALLY_USED' %}text-amber-600{% else %}text-purple-600{% endif %}">
           {{ vehicle.get_condition_display }}
         </span>
         <span style="color:#d1ccc4;">·</span>

@@ -68,13 +68,26 @@
 
                 <div>
 
-                    {% if vehicle.primary_image %}
+                    {% if vehicle.primary_image and vehicle.primary_image.image %}
 
-                        <div class="bg-white overflow-hidden">
+                        <div class="bg-white overflow-hidden shadow-sm">
 
                             <img
                                 src="{{ vehicle.primary_image.image.url }}"
                                 alt="{{ vehicle.primary_image.alt_text|default:vehicle.title }}"
+                                class="w-full aspect-[4/3] object-cover"
+                                loading="eager"
+                            >
+
+                        </div>
+
+                    {% elif vehicle.primary_image_url %}
+
+                        <div class="bg-white overflow-hidden shadow-sm">
+
+                            <img
+                                src="{{ vehicle.primary_image_url }}"
+                                alt="{{ vehicle.title }}"
                                 class="w-full aspect-[4/3] object-cover"
                                 loading="eager"
                             >
@@ -120,11 +133,32 @@
 
                             {% for image in vehicle.images.all %}
 
-                                <div class="bg-white overflow-hidden">
+                                <div class="bg-white overflow-hidden border border-[#e5e2db] hover:border-[#c9a84c] transition-colors">
 
                                     <img
                                         src="{{ image.image.url }}"
                                         alt="{{ image.alt_text|default:vehicle.title }}"
+                                        class="w-full aspect-square object-cover"
+                                        loading="lazy"
+                                    >
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% elif vehicle.display_gallery_urls %}
+
+                        <div class="grid grid-cols-3 gap-2 mt-3">
+
+                            {% for gal_url in vehicle.display_gallery_urls %}
+
+                                <div class="bg-white overflow-hidden border border-[#e5e2db] hover:border-[#c9a84c] transition-colors">
+
+                                    <img
+                                        src="{{ gal_url }}"
+                                        alt="{{ vehicle.title }}"
                                         class="w-full aspect-square object-cover"
                                         loading="lazy"
                                     >
