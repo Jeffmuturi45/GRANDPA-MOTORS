@@ -79,27 +79,78 @@ def vehicle_list(request):
     all_makes      = get_all_makes()
     all_categories = get_all_categories()
 
+    # Build make → models map for dynamic filter (JSON for JS)
+    from vehicles.models import VehicleModel
+    import json
+    make_models_map = {}
+    for make in all_makes:
+        models_qs = list(
+            VehicleModel.objects.filter(make=make)
+            .order_by("name")
+            .values("name", "slug")
+        )
+        make_models_map[make.slug] = models_qs
+
+    # Transmission and Fuel choices
+    from vehicles.models import Transmission, FuelType
+    transmission_choices = Transmission.choices
+    fuel_type_choices    = FuelType.choices
+
+    # Active selections for make/model so sidebar can pre-check them
+    selected_makes  = params.getlist("make")
+    selected_models = params.getlist("model")
+    selected_trans  = params.getlist("transmission")
+    selected_fuels  = params.getlist("fuel_type")
+
     # Build active filters summary for display
     active_filters = _build_active_filters(params)
 
     context = {
-        "vehicles":       page_obj,
-        "paginator":      paginator,
-        "page_obj":       page_obj,
-        "all_makes":      all_makes,
-        "all_categories": all_categories,
-        "sort_key":       sort_key,
-        "sort_options":   SORT_LABELS,
-        "active_filters": active_filters,
-        "total_count":    paginator.count,
-        "params":         params,
-        "page_title":     "Browse Vehicles",
+        "vehicles":           page_obj,
+        "paginator":          paginator,
+        "page_obj":           page_obj,
+        "all_makes":          all_makes,
+        "all_categories":     all_categories,
+        "make_models_map":    json.dumps(make_models_map),
+        "transmission_choices": transmission_choices,
+        "fuel_type_choices":  fuel_type_choices,
+        "selected_makes":     selected_makes,
+        "selected_models":    selected_models,
+        "selected_trans":     selected_trans,
+        "selected_fuels":     selected_fuels,
+        "sort_key":           sort_key,
+        "sort_options":       SORT_LABELS,
+        "active_filters":     active_filters,
+        "total_count":        paginator.count,
+        "params":             params,
+        "page_title":         "Browse Vehicles",
         "meta_description": (
             f"Search and filter {paginator.count:,} vehicles at "
             f"{settings.DEALERSHIP_NAME}. New, foreign used, and locally used cars in Kenya."
         ),
     }
     return render(request, "catalogue/vehicle_list.html", context)
+
+
+def api_models_for_make(request):
+    """AJAX endpoint: return models for a given make slug."""
+    from vehicles.models import VehicleModel, Make
+    make_slug = request.GET.get("make", "")
+    from django.http import JsonResponse
+    if not make_slug:
+        return JsonResponse({"models": []})
+    try:
+        make = Make.objects.get(slug=make_slug)
+        models = list(
+            VehicleModel.objects.filter(make=make)
+            .order_by("name")
+            .values("name", "slug")
+        )
+    except Make.DoesNotExist:
+        models = []
+    return JsonResponse({"models": models})
+
+
 
 
 # ── Vehicle Detail ────────────────────────────────────────────────────────────
